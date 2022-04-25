@@ -8,7 +8,7 @@
 		"prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
 		"lint": "eslint . --ext .ts --quiet",
 		"lint-fix": "eslint . --ext .ts --fix",
-        "migrate": "./node_modules/.bin/db-migrate up"
+		"migrate": "./node_modules/.bin/db-migrate up"
 	},
 	"keywords": [],
 	"author": "",
