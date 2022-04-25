@@ -5,15 +5,18 @@
 	"main": "index.js",
 	"scripts": {
 		"watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-        "prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
-        "lint": "eslint . --ext .ts --quiet",
-        "lint-fix": "eslint . --ext .ts --fix"
+		"prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
+		"lint": "eslint . --ext .ts --quiet",
+		"lint-fix": "eslint . --ext .ts --fix",
+        "migrate": "./node_modules/.bin/db-migrate up"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"body-parser": "^1.20.0",
+		"db-migrate": "^0.11.13",
+		"db-migrate-pg": "^1.2.2",
 		"dotenv": "^16.0.0",
 		"express": "^4.17.3",
 		"pg": "^8.7.3"

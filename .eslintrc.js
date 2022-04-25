@@ -57,8 +57,19 @@ module.exports = {
 		"no-invalid-this": "error",
 		"prefer-destructuring": [
 			"error",
-			{ array: true, object: true },
-			{ enforceForRenamedProperties: true }
+			{
+				VariableDeclarator: {
+					array: false,
+					object: true
+				},
+				AssignmentExpression: {
+					array: true,
+					object: false
+				}
+			},
+			{
+				enforceForRenamedProperties: false
+			}
 		],
 		"no-eval": "error",
 		"no-implied-eval": "error",
@@ -66,7 +77,6 @@ module.exports = {
 		"no-with": "error",
 		"semi": ["error", "always"],
 		"comma-dangle": ["error", "never"],
-		"indent": 0,
 		"no-confusing-arrow": 0,
 		"no-const-assign": 2,
 		"no-shadow": 0,
