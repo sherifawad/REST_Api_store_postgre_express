@@ -1,13 +1,6 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-
-export interface User {
-	id: number;
-	email: string;
-	firstName: string;
-	lastName: string;
-	password: string;
-}
+import { User } from "../typings/interface";
 
 export const index = async (): Promise<User[]> => {
 	try {
