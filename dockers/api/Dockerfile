@@ -14,5 +14,5 @@ USER node
 EXPOSE 4000
 # check for database is up to run specific commands (db_migration)
 RUN git clone https://github.com/vishnubob/wait-for-it.git
-# CMD ["npm", "run", "watch"]
+# CMD ["npm", "run", "test"]
 

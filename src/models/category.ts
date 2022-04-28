@@ -1,6 +1,7 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { Category } from "../typings/interface";
+import { CategoryQuery } from "../typings/types";
 import { createPatchString } from "../utils/db";
 
 export const index = async (): Promise<Category[]> => {
@@ -31,7 +32,7 @@ export const show = async (id: string): Promise<Category> => {
 export const create = async ({
 	name,
 	description
-}: Category): Promise<Category> => {
+}: CategoryQuery): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql =
