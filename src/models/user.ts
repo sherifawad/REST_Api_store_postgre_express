@@ -39,7 +39,7 @@ export const create = async ({
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql =
-			"INSERT INTO users (email, firstname, lastname, password) VALUES($1, $2, $3, $4) RETURNING *";
+			"INSERT INTO users (email, firstname, lastname, password) VALUES ($1, $2, $3, $4) RETURNING *";
 		// TODO: implement jwt authentication
 		const result = await conn.query(sql, [
 			email,

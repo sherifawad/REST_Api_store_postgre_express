@@ -26,3 +26,29 @@ export const createPatchString = <T>(
 	// Return a complete query string
 	return query.join(" ");
 };
+
+export const createInsertString = <T>(
+	tableName: string,
+	cols: Res<T>
+): string => {
+	// Setup static beginning of query
+	const query = [`INSERT INTO ${tableName} (`];
+	const keys: string[] = [];
+	const values: string[] = [];
+
+	Object.keys(cols).forEach((key, i) => {
+		keys.push(`${key}`);
+		values.push(`$${i + 1}`);
+	});
+	query.push(keys.join(", "));
+	query.push(")");
+
+	query.push("VALUES (");
+	query.push(values.join(", "));
+	query.push(")");
+	// return patched data
+	query.push(" RETURNING *");
+
+	// Return a complete query string
+	return query.join(" ");
+};

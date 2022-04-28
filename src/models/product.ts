@@ -1,12 +1,13 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-import { Product } from "../typings/interface";
-import { createPatchString } from "../utils/db";
+import { Category, Product } from "../typings/interface";
+import { ProductQuery } from "../typings/types";
+import { createInsertString, createPatchString } from "../utils/db";
 
 export const index = async (): Promise<Product[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT products.*, categories.name AS "categoryName" FROM products INNER JOIN categories ON products.categoryId = categories.id;`;
+		const sql = `SELECT * FROM products`;
 		const result: QueryResult<Product> = await conn.query(sql);
 		conn.release();
 		return result.rows.map(row => ({
@@ -14,12 +15,7 @@ export const index = async (): Promise<Product[]> => {
 			name: row.name,
 			description: row.description,
 			price: row.price,
-			...(row.categoryId && {
-				category: {
-					id: row.categoryId,
-					name: row.category?.name as string
-				}
-			})
+			category_id: row.category_id
 		}));
 	} catch (err) {
 		throw new Error(`categories index : ${err}`);
@@ -29,18 +25,20 @@ export const index = async (): Promise<Product[]> => {
 export const show = async (id: string): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT products.*, categories.name AS "categoryName" FROM products INNER JOIN categories ON products.categoryId = categories.id WHERE products.id = ${id};`;
-		const result: QueryResult<Product> = await conn.query(sql, [id]);
+		const sql = `SELECT products.*, categories.name As category_name, categories.description As category_description FROM products INNER JOIN categories ON products.category_id = categories.id WHERE products.id=($1);`;
+		const result = await conn.query(sql, [id]);
 		conn.release();
 		return result.rows.map(row => ({
 			id: row.id,
 			name: row.name,
 			description: row.description,
 			price: row.price,
-			...(row.categoryId && {
+			...(row.category_id && {
+				category_id: row.category_id,
 				category: {
-					id: row.categoryId,
-					name: row.category?.name as string
+					id: row.category_id,
+					name: row.category_name,
+					description: row.category_description
 				}
 			})
 		}))[0];
@@ -53,18 +51,23 @@ export const create = async ({
 	name,
 	description,
 	price,
-	categoryId
-}: Product): Promise<Product> => {
+	category_id
+}: ProductQuery): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql =
-			"INSERT INTO products (name, description, price, categoryId) VALUES($1, $2, $3, $4) RETURNING *";
-		const result = await conn.query(sql, [
-			name,
-			description || null,
-			price,
-			categoryId || null
-		]);
+		const sql = createInsertString<unknown>("products", {
+			...(name && { name: `${name}` }),
+			...(description && { description: `${description}` }),
+			...(price && { price: `${price}` }),
+			...(category_id && { category_id: `${category_id}` })
+		});
+		const inputs = [];
+		if (name) inputs.push(name);
+		if (description) inputs.push(description);
+		if (price) inputs.push(price);
+		if (category_id) inputs.push(category_id);
+
+		const result: QueryResult<Product> = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -77,22 +80,22 @@ export const patch = async ({
 	name,
 	description,
 	price,
-	categoryId
-}: Product): Promise<Product> => {
+	category_id
+}: ProductQuery): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = createPatchString<unknown>("categories", `${id}`, {
+		const sql = createPatchString<unknown>("products", `${id}`, {
 			...(name && { name: `${name}` }),
 			...(description && { description: `${description}` }),
 			...(price && { price: `${price}` }),
-			...(categoryId && { categoryId: `${categoryId}` })
+			...(category_id && { category_id: `${category_id}` })
 		});
-		const result = await conn.query(sql, [
-			name,
-			description,
-			price,
-			categoryId
-		]);
+		const inputs = [];
+		if (name) inputs.push(name);
+		if (description) inputs.push(description);
+		if (price) inputs.push(price);
+		if (category_id) inputs.push(category_id);
+		const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
