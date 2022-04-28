@@ -3,7 +3,7 @@ CREATE TABLE products (
     name VARCHAR(255) Not Null Unique,
     description text,
     price numeric NOT NULL DEFAULT 0,
-    CONSTRAINT categoryId
+    CONSTRAINT category_id
     FOREIGN KEY(id) 
     REFERENCES categories(id)
 );

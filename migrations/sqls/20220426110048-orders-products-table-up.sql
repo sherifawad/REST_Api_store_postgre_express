@@ -1,10 +1,10 @@
 Create Table orders_products (
   id Serial Primary Key,
   quantity numeric NOT NULL DEFAULT 1,
-    CONSTRAINT orderId
+    CONSTRAINT order_id
     FOREIGN KEY(id) 
     REFERENCES orders(id),
-    CONSTRAINT productId
+    CONSTRAINT product_id
     FOREIGN KEY(id) 
     REFERENCES products(id)
 );

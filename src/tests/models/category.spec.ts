@@ -54,6 +54,18 @@ describe("Category Model", () => {
 		});
 	});
 
+	it("show method should patch category", async () => {
+		const result = await patch({
+			id: 1,
+			name: "Electronics patched"
+		} as unknown as CategoryQuery);
+		expect(result).toEqual({
+			id: 1,
+			name: "Electronics patched",
+			description: "electronic category description"
+		});
+	});
+
 	it("delete method should remove the category", async () => {
 		Remove("1");
 		const result = await index();

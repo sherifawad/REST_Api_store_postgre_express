@@ -20,6 +20,8 @@ export const createPatchString = <T>(
 
 	// Add the WHERE statement to look up by id
 	query.push(`WHERE id = ${id}`);
+	// return patched data
+	query.push(" RETURNING *");
 
 	// Return a complete query string
 	return query.join(" ");

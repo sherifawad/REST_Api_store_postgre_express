@@ -2,8 +2,8 @@ export interface User {
 	id: number;
 	email: string;
 	active: boolean;
-	firstName: string;
-	lastName: string;
+	firstname: string;
+	lastname: string;
 	password: string;
 	orders?: Order[];
 }
@@ -19,7 +19,7 @@ export interface Product {
 	name: string;
 	description?: string;
 	price: number;
-	categoryId?: number;
+	category_id?: number;
 	category?: Category;
 }
 

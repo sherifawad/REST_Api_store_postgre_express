@@ -49,14 +49,17 @@ export const patch = async ({
 	id,
 	name,
 	description
-}: Category): Promise<Category> => {
+}: CategoryQuery): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = createPatchString<unknown>("categories", `${id}`, {
 			...(name && { name: `${name}` }),
 			...(description && { description: `${description}` })
 		});
-		const result = await conn.query(sql, [name, description]);
+		const inputs = [];
+		if (name) inputs.push(name);
+		if (description) inputs.push(description);
+		const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
