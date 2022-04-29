@@ -1,6 +1,6 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-import { Category, Product } from "../typings/interface";
+import { Product } from "../typings/interface";
 import { ProductQuery } from "../typings/types";
 import { createInsertString, createPatchString } from "../utils/db";
 

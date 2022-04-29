@@ -23,10 +23,16 @@ export interface Product {
 	category?: Category;
 }
 
+export interface OrderProduct {
+	id: number;
+	quantity: number;
+	order_id: number;
+	product_id: number;
+}
 export interface Order {
 	id: number;
-	date: Date;
-	user: User;
-	quantity: number;
-	products: Product[];
+	date?: Date;
+	user_id: number;
+	user?: User;
+	products?: OrderProduct[];
 }

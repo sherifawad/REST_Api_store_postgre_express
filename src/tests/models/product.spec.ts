@@ -29,6 +29,13 @@ describe("Product Model", () => {
 			price: 3310,
 			category_id: 1
 		} as unknown as ProductQuery);
+
+		await create({
+			name: "Nokia 3.21 plus",
+			description: "SmartNokia Phone",
+			price: 2150,
+			category_id: 1
+		} as unknown as ProductQuery);
 		expect(result).toEqual({
 			id: 1,
 			name: "Nokia 3310",
