@@ -71,21 +71,6 @@ export const create = async ({
 		const sql = createInsert("products", out.keys);
 		const result: QueryResult<Product> = await conn.query(sql, out.values);
 
-		// const sql = createInsertString<unknown>("products", {
-		// 	...(product_name && { name: `${product_name}` }),
-		// 	...(product_description && {
-		// 		product_description: `${product_description}`
-		// 	}),
-		// 	...(product_price && { price: `${product_price}` }),
-		// 	...(category_id && { category_id: `${category_id}` })
-		// });
-		// const inputs = [];
-		// if (product_name) inputs.push(product_name);
-		// if (product_description) inputs.push(product_description);
-		// if (product_price) inputs.push(product_price);
-		// if (category_id) inputs.push(category_id);
-
-		// const result: QueryResult<Product> = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -118,24 +103,6 @@ export const patch = async ({
 		);
 
 		const result = await conn.query(sql, out.values);
-
-		// const sql = createPatchString<Product>(
-		// 	"product_id",
-		// 	"products",
-		// 	`${product_id}`,
-		// 	{
-		// 		...(product_name && { product_name }),
-		// 		...(product_description && { product_description }),
-		// 		...(product_price && { product_price }),
-		// 		...(category_id && { category_id })
-		// 	}
-		// );
-		// const inputs = [];
-		// if (product_name) inputs.push(product_name);
-		// if (product_description) inputs.push(product_description);
-		// if (product_price) inputs.push(product_price);
-		// if (category_id) inputs.push(category_id);
-		// const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
