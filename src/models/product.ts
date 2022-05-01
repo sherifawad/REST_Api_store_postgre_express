@@ -2,13 +2,7 @@ import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { Product } from "../typings/interface";
 import { ProductQuery } from "../typings/types";
-import {
-	createInsert,
-	createInsertString,
-	createPatch,
-	createPatchString,
-	queryPrepare
-} from "../utils/db";
+import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
 export const index = async (): Promise<Product[]> => {
 	try {
