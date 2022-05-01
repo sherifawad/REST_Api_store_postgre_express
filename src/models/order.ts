@@ -7,46 +7,51 @@ import { createInsertString } from "../utils/db";
 export const index = async (): Promise<OrderQuery[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		// const sql = `SELECT orders.*,
-		//  users.id As user_id, users.email As user_email, users.firstname As user_firstname, users.lastname As user_lastname,
-		//   orders_products.quantity As orders_products_quantity,
-		//    products.id As products_id, products.name As products_name, products.description As products_description, products.price As products_price
-		//     FROM orders INNER JOIN users ON orders.user_id = users.id
-		//      INNER JOIN orders_products ON orders_products.order_id = orders.id
-		//       INNER JOIN products ON orders_products.product_id = products.id;`;
 
-		// const sql = ` SELECT p.id As p_id, p.name As p_name, p.price As p_price, MAX(op.quantity) as op_quantity
-		//             FROM orders_products As op
-		//             INNER JOIN products As p ON op.product_id = p.id
-		//             GROUP BY p.id`;
+		const productsSql = ` 
+                    SELECT op.*, p.*, c.*
+                    FROM orders_products As op 
+                    INNER JOIN products As p
+                    ON op.product_id = p.product_id
+                    INNER JOIN categories As c
+                    ON p.category_id = c.category_id;`;
 
-		const sql = ` SELECT p.id As p_id, p.name As p_name, p.price As p_price, MAX(op.quantity) as op_quantity
-                    FROM orders_products As op
-		            INNER JOIN products As p ON op.product_id = p.id
-		            GROUP BY p.id INNER JOIN orders As o ON op.order_id = o.id`;
-
-		// const sql = `Select op.quantity  As op_quantity
-		// FROM orders_products As op
-		// INNER join (SELECT p.id As p_id, p.name As p_name, p.price As p_price
-		//               FROM products As p
-		//               GROUP BY id) As c
-		//               ON op.product_id = p.id`;
-
-		// const sql = `SELECT orders_products.*,
-		// MAX(users.id) As user_id, MAX(users.email) As user_email,MAX(users.firstname) As user_firstname, MAX(users.lastname) As user_lastname,
-		// MAX(products.id) As products_id, MAX(products.name) As products_name, MAX(products.description) As products_description, MAX(products.price) As products_price
-		//         FROM orders_products INNER JOIN orders ON orders_products.order_id = orders.id
-		//          INNER JOIN users ON orders.user_id = users.id
-		//            INNER JOIN products ON orders_products.product_id = products.id
-		//             GROUP BY orders_products.id;`;
+		const sql = `
+                    SELECT o.*, u.*
+                    FROM orders As o
+                    INNER JOIN users As u 
+                    ON o.user_id = u.user_id;`;
 
 		// const sql = `SELECT * FROM orders`;
+		const productsResult: QueryResult<OrderProduct> = await conn.query(
+			productsSql
+		);
+
 		const result = await conn.query(sql);
 		conn.release();
+
+		const data = result.rows.map(row => ({
+			order_id: row.order_id,
+			order_date: row.order_date,
+			user_id: row.user_id,
+			User: {
+				user_id: row.user_id,
+				user_email: row.user_email,
+				user_firstname: row.user_firstname,
+				user_lastname: row.user_lastname
+			},
+			products: productsResult.rows.map(productRow => ({
+				order_product_id: row.order_product_id,
+				order_id: row.id,
+				order_product_quantity: productRow.order_product_quantity,
+				product_id: productRow.product_id
+			}))
+		}));
 		console.log(
-			"🚀 ~ file: order.ts ~ line 21 ~ index ~ result",
-			result.rows
+			"🚀 ~ file: order.ts ~ line 59 ~ index ~ data",
+			JSON.stringify(data)
 		);
+
 		return result.rows.map(row => ({
 			id: row.id,
 			date: row.date,
@@ -68,45 +73,50 @@ export const index = async (): Promise<OrderQuery[]> => {
 
 export const create = async ({
 	user_id,
-	products
+	order_date,
+	order_products
 }: OrderQuery): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sqlOrderTable = createInsertString<unknown>("orders", {
-			...(user_id && { user_id: `${user_id}` })
+		const sqlOrderTable = createInsertString<Order>("orders", {
+			...(user_id && { user_id }),
+			...(order_date && { order_date })
 		});
 		const sqlOrderTableInputs = [];
 		if (user_id) sqlOrderTableInputs.push(user_id);
+		if (order_date) sqlOrderTableInputs.push(order_date);
 
 		const result: QueryResult<Order> = await conn.query(
 			sqlOrderTable,
 			sqlOrderTableInputs
 		);
 
-		(products as unknown as OrderProduct[]).forEach(async product => {
+		(order_products as unknown as OrderProduct[]).forEach(async product => {
 			const sqlOrdersProductsTable = createInsertString<unknown>(
 				"orders_products",
 				{
-					...(product.quantity && {
-						quantity: `${product.quantity}`
+					...(product.order_product_quantity && {
+						quantity: `${product.order_product_quantity}`
 					}),
 					...{
 						product_id: `${product.product_id}`
 					},
-					...(result.rows[0].id && {
-						order_id: `${result.rows[0].id}`
+					...(result.rows[0].order_id && {
+						order_id: `${result.rows[0].order_id}`
 					})
 				}
 			);
 
 			const sqlOrdersProductsTableInputs = [];
-			if (product.quantity)
-				sqlOrdersProductsTableInputs.push(product.quantity);
+			if (product.order_product_quantity)
+				sqlOrdersProductsTableInputs.push(
+					product.order_product_quantity
+				);
 
 			sqlOrdersProductsTableInputs.push(product.product_id);
 
-			if (result.rows[0].id)
-				sqlOrdersProductsTableInputs.push(result.rows[0].id);
+			if (result.rows[0].order_id)
+				sqlOrdersProductsTableInputs.push(result.rows[0].order_id);
 
 			await conn.query(
 				sqlOrdersProductsTable,

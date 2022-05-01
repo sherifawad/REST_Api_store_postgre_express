@@ -24,13 +24,13 @@ describe("Category Model", () => {
 
 	it("create method should add a category", async () => {
 		const result = await create({
-			name: "Electronics",
-			description: "electronic category description"
+			category_name: "Electronics",
+			category_description: "electronic category description"
 		} as unknown as CategoryQuery);
 		expect(result).toEqual({
-			id: 1,
-			name: "Electronics",
-			description: "electronic category description"
+			category_id: 1,
+			category_name: "Electronics",
+			category_description: "electronic category description"
 		});
 	});
 
@@ -38,9 +38,9 @@ describe("Category Model", () => {
 		const result = await index();
 		expect(result).toEqual([
 			{
-				id: 1,
-				name: "Electronics",
-				description: "electronic category description"
+				category_id: 1,
+				category_name: "Electronics",
+				category_description: "electronic category description"
 			}
 		]);
 	});
@@ -48,21 +48,21 @@ describe("Category Model", () => {
 	it("show method should return the correct category", async () => {
 		const result = await show("1");
 		expect(result).toEqual({
-			id: 1,
-			name: "Electronics",
-			description: "electronic category description"
+			category_id: 1,
+			category_name: "Electronics",
+			category_description: "electronic category description"
 		});
 	});
 
 	it("show method should patch category", async () => {
 		const result = await patch({
-			id: 1,
-			name: "Electronics patched"
+			category_id: 1,
+			category_name: "Electronics patched"
 		} as unknown as CategoryQuery);
 		expect(result).toEqual({
-			id: 1,
-			name: "Electronics patched",
-			description: "electronic category description"
+			category_id: 1,
+			category_name: "Electronics patched",
+			category_description: "electronic category description"
 		});
 	});
 

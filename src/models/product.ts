@@ -2,7 +2,13 @@ import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { Product } from "../typings/interface";
 import { ProductQuery } from "../typings/types";
-import { createInsertString, createPatchString } from "../utils/db";
+import {
+	createInsert,
+	createInsertString,
+	createPatch,
+	createPatchString,
+	queryPrepare
+} from "../utils/db";
 
 export const index = async (): Promise<Product[]> => {
 	try {
@@ -11,10 +17,10 @@ export const index = async (): Promise<Product[]> => {
 		const result: QueryResult<Product> = await conn.query(sql);
 		conn.release();
 		return result.rows.map(row => ({
-			id: row.id,
-			name: row.name,
-			description: row.description,
-			price: row.price,
+			product_id: row.product_id,
+			product_name: row.product_name,
+			product_description: row.product_description,
+			product_price: row.product_price,
 			category_id: row.category_id
 		}));
 	} catch (err) {
@@ -22,52 +28,70 @@ export const index = async (): Promise<Product[]> => {
 	}
 };
 
-export const show = async (id: string): Promise<Product> => {
+export const show = async (product_id: string): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT products.*, categories.name As category_name, categories.description As category_description FROM products INNER JOIN categories ON products.category_id = categories.id WHERE products.id=($1);`;
-		const result = await conn.query(sql, [id]);
+		const sql = `SELECT products.*, 
+        categories.* 
+        FROM products INNER JOIN categories 
+        ON products.category_id = categories.category_id 
+        WHERE products.product_id=($1);`;
+		const result = await conn.query(sql, [product_id]);
 		conn.release();
 		return result.rows.map(row => ({
-			id: row.id,
-			name: row.name,
-			description: row.description,
-			price: row.price,
+			product_id: row.product_id,
+			product_name: row.product_name,
+			product_description: row.product_description,
+			product_price: row.product_price,
 			...(row.category_id && {
 				category_id: row.category_id,
 				category: {
-					id: row.category_id,
-					name: row.category_name,
-					description: row.category_description
+					category_id: row.category_id,
+					category_name: row.category_name,
+					category_description: row.category_description
 				}
 			})
 		}))[0];
 	} catch (err) {
-		throw new Error(`Product with id: ${id} does not exist: ${err}`);
+		throw new Error(
+			`Product with id: ${product_id} does not exist: ${err}`
+		);
 	}
 };
 
 export const create = async ({
-	name,
-	description,
-	price,
+	product_name,
+	product_description,
+	product_price,
 	category_id
 }: ProductQuery): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = createInsertString<unknown>("products", {
-			...(name && { name: `${name}` }),
-			...(description && { description: `${description}` }),
-			...(price && { price: `${price}` }),
-			...(category_id && { category_id: `${category_id}` })
+		const out = queryPrepare<Product>({
+			product_name,
+			product_description,
+			product_price,
+			category_id
 		});
-		const inputs = [];
-		if (name) inputs.push(name);
-		if (description) inputs.push(description);
-		if (price) inputs.push(price);
-		if (category_id) inputs.push(category_id);
 
-		const result: QueryResult<Product> = await conn.query(sql, inputs);
+		const sql = createInsert("products", out.keys);
+		const result: QueryResult<Product> = await conn.query(sql, out.values);
+
+		// const sql = createInsertString<unknown>("products", {
+		// 	...(product_name && { name: `${product_name}` }),
+		// 	...(product_description && {
+		// 		product_description: `${product_description}`
+		// 	}),
+		// 	...(product_price && { price: `${product_price}` }),
+		// 	...(category_id && { category_id: `${category_id}` })
+		// });
+		// const inputs = [];
+		// if (product_name) inputs.push(product_name);
+		// if (product_description) inputs.push(product_description);
+		// if (product_price) inputs.push(product_price);
+		// if (category_id) inputs.push(category_id);
+
+		// const result: QueryResult<Product> = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -76,26 +100,48 @@ export const create = async ({
 };
 
 export const patch = async ({
-	id,
-	name,
-	description,
-	price,
+	product_id,
+	product_name,
+	product_description,
+	product_price,
 	category_id
 }: ProductQuery): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = createPatchString<unknown>("products", `${id}`, {
-			...(name && { name: `${name}` }),
-			...(description && { description: `${description}` }),
-			...(price && { price: `${price}` }),
-			...(category_id && { category_id: `${category_id}` })
+
+		const out = queryPrepare<Product>({
+			product_id,
+			product_name,
+			product_description,
+			product_price,
+			category_id
 		});
-		const inputs = [];
-		if (name) inputs.push(name);
-		if (description) inputs.push(description);
-		if (price) inputs.push(price);
-		if (category_id) inputs.push(category_id);
-		const result = await conn.query(sql, inputs);
+		const sql = createPatch(
+			"product_id",
+			"products",
+			`${product_id}`,
+			out.keys
+		);
+
+		const result = await conn.query(sql, out.values);
+
+		// const sql = createPatchString<Product>(
+		// 	"product_id",
+		// 	"products",
+		// 	`${product_id}`,
+		// 	{
+		// 		...(product_name && { product_name }),
+		// 		...(product_description && { product_description }),
+		// 		...(product_price && { product_price }),
+		// 		...(category_id && { category_id })
+		// 	}
+		// );
+		// const inputs = [];
+		// if (product_name) inputs.push(product_name);
+		// if (product_description) inputs.push(product_description);
+		// if (product_price) inputs.push(product_price);
+		// if (category_id) inputs.push(category_id);
+		// const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -103,14 +149,18 @@ export const patch = async ({
 	}
 };
 
-export const Remove = async (id: string): Promise<Product> => {
+export const Remove = async (product_id: string): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "DELETE FROM products WHERE id=($1)";
-		const result: QueryResult<Product> = await conn.query(sql, [id]);
+		const sql = "DELETE FROM products WHERE product_id=($1)";
+		const result: QueryResult<Product> = await conn.query(sql, [
+			product_id
+		]);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`Product with id: ${id} can not be removed: ${err}`);
+		throw new Error(
+			`Product with id: ${product_id} can not be removed: ${err}`
+		);
 	}
 };

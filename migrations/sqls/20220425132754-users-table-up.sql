@@ -1,8 +1,8 @@
 Create Table users (
-  id Serial Primary key,
-  email  VarChar(100)  Not Null Unique,
-  active  boolean not null default(true),
-  firstname VarChar(100) Not Null,
-  lastname VarChar(100) Not Null,
-  password Text Not Null
+    user_id Serial Primary key,
+    user_email  VarChar(100)  Not Null Unique,
+    user_active  boolean not null default(true),
+    user_firstname VarChar(100) Not Null,
+    user_lastname VarChar(100) Not Null,
+    user_password Text Not Null
 );

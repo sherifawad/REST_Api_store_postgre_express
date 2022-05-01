@@ -1,8 +1,8 @@
 Create Table orders_products (
-    id Serial Primary Key,
-    quantity numeric NOT NULL DEFAULT 1,
+    order_product_id Serial Primary Key,
+    order_product_quantity numeric NOT NULL DEFAULT 1,
     order_id INT NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders (id), 
+    FOREIGN KEY (order_id) REFERENCES orders (order_id), 
     product_id INT NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES products (id)
+    FOREIGN KEY (product_id) REFERENCES products (product_id)
 );

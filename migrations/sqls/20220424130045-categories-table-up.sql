@@ -1,5 +1,5 @@
 CREATE TABLE categories (
-    id SERIAL PRIMARY  KEY ,
-    name VARCHAR(255) Not Null Unique,
-    description text
+    category_id SERIAL PRIMARY  KEY ,
+    category_name VARCHAR(255) Not Null Unique,
+    category_description text
 );

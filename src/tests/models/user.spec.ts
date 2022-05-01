@@ -24,18 +24,18 @@ describe("User Model", () => {
 
 	it("create method should add a user", async () => {
 		const result = await create({
-			email: "email@c.com",
-			firstname: "Sh",
-			lastname: "A",
-			password: "password"
+			user_email: "email@c.com",
+			user_firstname: "Sh",
+			user_lastname: "A",
+			user_password: "password"
 		} as unknown as UserQuery);
 		expect(result).toEqual({
-			id: 1,
-			email: "email@c.com",
-			firstname: "Sh",
-			lastname: "A",
-			password: "password",
-			active: true
+			user_id: 1,
+			user_email: "email@c.com",
+			user_firstname: "Sh",
+			user_lastname: "A",
+			user_password: "password",
+			user_active: true
 		});
 	});
 
@@ -43,10 +43,10 @@ describe("User Model", () => {
 		const result = await index();
 		expect(result).toEqual([
 			{
-				id: 1,
-				email: "email@c.com",
-				firstname: "Sh",
-				lastname: "A"
+				user_id: 1,
+				user_email: "email@c.com",
+				user_firstname: "Sh",
+				user_lastname: "A"
 			}
 		] as unknown as UserQuery[]);
 	});
@@ -54,27 +54,27 @@ describe("User Model", () => {
 	it("show method should return the correct user", async () => {
 		const result = await show("1");
 		expect(result).toEqual({
-			id: 1,
-			email: "email@c.com",
-			firstname: "Sh",
-			lastname: "A",
-			password: "password",
-			active: true
+			user_id: 1,
+			user_email: "email@c.com",
+			user_firstname: "Sh",
+			user_lastname: "A",
+			user_password: "password",
+			user_active: true
 		});
 	});
 
 	it("show method should patch user", async () => {
 		const result = await patch({
-			id: 1,
-			password: "New password"
+			user_id: 1,
+			user_password: "New password"
 		} as unknown as UserQuery);
 		expect(result).toEqual({
-			id: 1,
-			email: "email@c.com",
-			firstname: "Sh",
-			lastname: "A",
-			password: "New password",
-			active: true
+			user_id: 1,
+			user_email: "email@c.com",
+			user_firstname: "Sh",
+			user_lastname: "A",
+			user_password: "New password",
+			user_active: true
 		});
 	});
 
@@ -87,12 +87,12 @@ describe("User Model", () => {
 	it("show method should return the correct user with active = false", async () => {
 		const result = await show("1");
 		expect(result).toEqual({
-			id: 1,
-			email: "email@c.com",
-			firstname: "Sh",
-			lastname: "A",
-			password: "New password",
-			active: false
+			user_id: 1,
+			user_email: "email@c.com",
+			user_firstname: "Sh",
+			user_lastname: "A",
+			user_password: "New password",
+			user_active: false
 		});
 	});
 });

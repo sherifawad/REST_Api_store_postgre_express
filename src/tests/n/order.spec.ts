@@ -22,11 +22,18 @@ describe("Order Model", () => {
 					quantity: 10,
 					product_id: 2
 				}
-			]
+			],
+			date: new Date(
+				"Sat Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
+			)
 		} as unknown as OrderQuery);
 		expect(result).toEqual({
-			id: 1,
-			user_id: 1
+			order_id: 1,
+			user_id: 1,
+			order_date: new Date(
+				"Sat Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
+			),
+			order_products: []
 		});
 	});
 

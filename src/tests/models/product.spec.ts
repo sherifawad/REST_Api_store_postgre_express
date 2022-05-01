@@ -24,23 +24,23 @@ describe("Product Model", () => {
 
 	it("create method should add a product", async () => {
 		const result = await create({
-			name: "Nokia 3310",
-			description: "a mobile made from strong materials",
-			price: 3310,
+			product_name: "Nokia 3310",
+			product_description: "a mobile made from strong materials",
+			product_price: 3310,
 			category_id: 1
 		} as unknown as ProductQuery);
 
 		await create({
-			name: "Nokia 3.21 plus",
-			description: "SmartNokia Phone",
-			price: 2150,
+			product_name: "Nokia 3.21 plus",
+			product_description: "SmartNokia Phone",
+			product_price: 2150,
 			category_id: 1
 		} as unknown as ProductQuery);
 		expect(result).toEqual({
-			id: 1,
-			name: "Nokia 3310",
-			description: "a mobile made from strong materials",
-			price: "3310.00",
+			product_id: 1,
+			product_name: "Nokia 3310",
+			product_description: "a mobile made from strong materials",
+			product_price: "3310.00",
 			category_id: 1
 		});
 	});
@@ -49,10 +49,17 @@ describe("Product Model", () => {
 		const result = await index();
 		expect(result).toEqual([
 			{
-				id: 1,
-				name: "Nokia 3310",
-				description: "a mobile made from strong materials",
-				price: "3310.00",
+				product_id: 1,
+				product_name: "Nokia 3310",
+				product_description: "a mobile made from strong materials",
+				product_price: "3310.00",
+				category_id: 1
+			},
+			{
+				product_id: 2,
+				product_name: "Nokia 3.21 plus",
+				product_description: "SmartNokia Phone",
+				product_price: "2150.00",
 				category_id: 1
 			}
 		]);
@@ -62,29 +69,29 @@ describe("Product Model", () => {
 		const result = await show("1");
 
 		expect(result).toEqual({
-			id: 1,
-			name: "Nokia 3310",
-			description: "a mobile made from strong materials",
-			price: "3310.00",
+			product_id: 1,
+			product_name: "Nokia 3310",
+			product_description: "a mobile made from strong materials",
+			product_price: "3310.00",
 			category_id: 1,
 			category: {
-				id: 1,
-				name: "Electronics patched",
-				description: "electronic category description"
+				category_id: 1,
+				category_name: "Electronics patched",
+				category_description: "electronic category description"
 			}
 		});
 	});
 
 	it("show method should patch product", async () => {
 		const result = await patch({
-			id: 1,
-			price: 300
+			product_id: 1,
+			product_price: 300
 		} as unknown as ProductQuery);
 		expect(result).toEqual({
-			id: 1,
-			name: "Nokia 3310",
-			description: "a mobile made from strong materials",
-			price: "300.00",
+			product_id: 1,
+			product_name: "Nokia 3310",
+			product_description: "a mobile made from strong materials",
+			product_price: "300.00",
 			category_id: 1
 		});
 	});

@@ -2,12 +2,18 @@ import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { Category } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
-import { createPatchString } from "../utils/db";
+import {
+	createInsert,
+	createInsertString,
+	createPatch,
+	createPatchString,
+	queryPrepare
+} from "../utils/db";
 
 export const index = async (): Promise<Category[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "SELECT id, name, description FROM categories";
+		const sql = "SELECT * FROM categories";
 		const result: QueryResult<Category> = await conn.query(sql);
 		conn.release();
 		return result.rows;
@@ -16,28 +22,44 @@ export const index = async (): Promise<Category[]> => {
 	}
 };
 
-export const show = async (id: string): Promise<Category> => {
+export const show = async (category_id: string): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql =
-			"SELECT id, name, description FROM categories WHERE id=($1)";
-		const result: QueryResult<Category> = await conn.query(sql, [id]);
+		const sql = "SELECT * FROM categories WHERE category_id=($1)";
+		const result: QueryResult<Category> = await conn.query(sql, [
+			category_id
+		]);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`Category with id: ${id} does not exist: ${err}`);
+		throw new Error(
+			`Category with id: ${category_id} does not exist: ${err}`
+		);
 	}
 };
 
 export const create = async ({
-	name,
-	description
+	category_name,
+	category_description
 }: CategoryQuery): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql =
-			"INSERT INTO categories (name, description) VALUES($1, $2) RETURNING *";
-		const result = await conn.query(sql, [name, description || null]);
+		const out = queryPrepare<Category>({
+			category_name,
+			category_description
+		});
+
+		const sql = createInsert("categories", out.keys);
+		const result: QueryResult<Category> = await conn.query(sql, out.values);
+		// const sql = createInsertString<Category>("categories", {
+		// 	...(category_name && { category_name }),
+		// 	...(category_description && {
+		// 		category_description
+		// 	})
+		// });
+		// const inputs = [];
+		// if (category_name) inputs.push(category_name);
+		// if (category_description) inputs.push(category_description);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -46,20 +68,37 @@ export const create = async ({
 };
 
 export const patch = async ({
-	id,
-	name,
-	description
+	category_id,
+	category_name,
+	category_description
 }: CategoryQuery): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = createPatchString<unknown>("categories", `${id}`, {
-			...(name && { name: `${name}` }),
-			...(description && { description: `${description}` })
+
+		const out = queryPrepare<Category>({
+			category_name,
+			category_description
 		});
-		const inputs = [];
-		if (name) inputs.push(name);
-		if (description) inputs.push(description);
-		const result = await conn.query(sql, inputs);
+		const sql = createPatch(
+			"category_id",
+			"categories",
+			`${category_id}`,
+			out.keys
+		);
+
+		const result = await conn.query(sql, out.values);
+		// const sql = createPatchString<Category>(
+		// 	"category_id",
+		// 	"categories",
+		// 	`${category_id}`,
+		// 	{
+		// 		...(category_name && { category_name }),
+		// 		...(category_description && { category_description })
+		// 	}
+		// );
+		// const inputs = [];
+		// if (category_name) inputs.push(category_name);
+		// if (category_description) inputs.push(category_description);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -67,14 +106,18 @@ export const patch = async ({
 	}
 };
 
-export const Remove = async (id: string): Promise<Category> => {
+export const Remove = async (category_id: string): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "DELETE FROM categories WHERE id=($1)";
-		const result: QueryResult<Category> = await conn.query(sql, [id]);
+		const sql = "DELETE FROM categories WHERE category_id=($1)";
+		const result: QueryResult<Category> = await conn.query(sql, [
+			category_id
+		]);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`Category with id: ${id} can not be removed: ${err}`);
+		throw new Error(
+			`Category with id: ${category_id} can not be removed: ${err}`
+		);
 	}
 };

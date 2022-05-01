@@ -1,38 +1,37 @@
 export interface User {
-	id: number;
-	email: string;
-	active: boolean;
-	firstname: string;
-	lastname: string;
-	password: string;
+	user_id: number;
+	user_email: string;
+	user_active: boolean;
+	user_firstname: string;
+	user_lastname: string;
+	user_password: string;
 	orders?: Order[];
 }
 
 export interface Category {
-	id: number;
-	name: string;
-	description?: string;
+	category_id: number;
+	category_name: string;
+	category_description?: string;
 }
 
 export interface Product {
-	id: number;
-	name: string;
-	description?: string;
-	price: string;
+	product_id: number;
+	product_name: string;
+	product_description?: string;
+	product_price: string;
 	category_id?: number;
 	category?: Category;
 }
 
-export interface OrderProduct {
-	id: number;
-	quantity: number;
-	order_id: number;
-	product_id: number;
+export interface OrderProduct extends Product {
+	order_product_id: number;
+	orderId: Order;
+	order_product_quantity: number;
 }
 export interface Order {
-	id: number;
-	date?: Date;
+	order_id: number;
+	order_date?: Date;
 	user_id: number;
 	user?: User;
-	products?: OrderProduct[];
+	order_products: OrderProduct[];
 }
