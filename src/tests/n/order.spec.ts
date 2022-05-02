@@ -17,10 +17,6 @@ describe("Order Model", () => {
 				{
 					order_product_quantity: 5,
 					product_id: 1
-				},
-				{
-					order_product_quantity: 10,
-					product_id: 2
 				}
 			],
 			order_date: new Date(
@@ -63,16 +59,6 @@ describe("Order Model", () => {
 							"a mobile made from strong materials",
 						product_price: "300.00",
 						user_id: 1
-					},
-					{
-						order_product_id: 2,
-						order_id: 1,
-						order_product_quantity: 10,
-						product_id: 2,
-						product_name: "Nokia 3.21 plus",
-						product_description: "SmartNokia Phone",
-						product_price: "2150.00",
-						user_id: 1
 					}
 				]
 			}
@@ -100,8 +86,12 @@ describe("Order Model", () => {
 			order_id: 1,
 			order_products: [
 				{
-					order_product_id: 2,
-					order_product_quantity: 2
+					order_product_id: 1,
+					order_product_quantity: 8
+				},
+				{
+					order_product_quantity: 3,
+					product_id: 2
 				}
 			]
 		} as unknown as OrderQuery);
@@ -128,7 +118,7 @@ describe("Order Model", () => {
 				{
 					order_product_id: 1,
 					order_id: 1,
-					order_product_quantity: 5,
+					order_product_quantity: 8,
 					product_id: 1,
 					product_name: "Nokia 3310",
 					product_description: "a mobile made from strong materials",
@@ -138,7 +128,7 @@ describe("Order Model", () => {
 				{
 					order_product_id: 2,
 					order_id: 1,
-					order_product_quantity: 2,
+					order_product_quantity: 3,
 					product_id: 2,
 					product_name: "Nokia 3.21 plus",
 					product_description: "SmartNokia Phone",

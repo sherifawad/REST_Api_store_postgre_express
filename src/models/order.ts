@@ -131,19 +131,27 @@ export const patch = async ({
 
 		if (order_products && (order_products as OrderProduct[]).length > 0) {
 			(order_products as OrderProduct[]).forEach(async product => {
-				if (!product.order_product_id)
-					throw new Error("order can not be patched");
-
 				const OutOrderProduct = queryPrepare<OrderProduct>({
+					order_id,
 					product_id: product.product_id,
 					order_product_quantity: product.order_product_quantity
 				});
-				const SqlOrderProduct = createPatch(
-					"order_product_id",
-					"orders_products",
-					`${product.order_product_id}`,
-					OutOrderProduct.keys
-				);
+
+				let SqlOrderProduct: string;
+
+				if (product.order_product_id) {
+					SqlOrderProduct = createPatch(
+						"order_product_id",
+						"orders_products",
+						`${product.order_product_id}`,
+						OutOrderProduct.keys
+					);
+				} else {
+					SqlOrderProduct = createInsert(
+						"orders_products",
+						OutOrderProduct.keys
+					);
+				}
 				await conn.query(SqlOrderProduct, OutOrderProduct.values);
 			});
 		}
