@@ -1,12 +1,11 @@
-import express, { Express, Response, Request } from "express";
+import express, { Express } from "express";
+import routes from "./routes";
 
 const app: Express = express();
-let count = 0;
-app.get("/api/", (_req: Request, res: Response) => {
-	count++;
-	res.send(`link visited ${count} time`);
-});
+const PORT: string = process.env.PORT ?? "4000";
 
-app.listen(process.env.PORT, () =>
-	console.log("server started at http://localhost:4000")
+app.use("/api", routes);
+
+app.listen(PORT, () =>
+	console.log(`Server started at http://localhost:${PORT}`)
 );

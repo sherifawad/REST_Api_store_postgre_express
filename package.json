@@ -24,6 +24,7 @@
 		"body-parser": "^1.20.0",
 		"dotenv": "^16.0.0",
 		"express": "^4.17.3",
+		"express-validator": "^6.14.0",
 		"pg": "^8.7.3"
 	},
 	"devDependencies": {
@@ -32,6 +33,8 @@
 		"@types/jasmine": "^4.0.3",
 		"@types/node": "latest",
 		"@types/pg": "^8.6.5",
+		"@types/supertest": "^2.0.12",
+		"@types/validator": "^13.7.2",
 		"cross-env": "^7.0.3",
 		"db-migrate": "^0.11.13",
 		"db-migrate-pg": "^1.2.2",
@@ -46,6 +49,7 @@
 		"jasmine-ts": "^0.4.0",
 		"prettier": "^2.6.2",
 		"rimraf": "^3.0.2",
+		"supertest": "^6.2.3",
 		"ts-node": "^10.7.0",
 		"tsc-watch": "^5.0.3",
 		"typescript": "^4.6.3"

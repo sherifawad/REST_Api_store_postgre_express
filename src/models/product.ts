@@ -53,6 +53,21 @@ export const show = async (product_id: string): Promise<Product> => {
 	}
 };
 
+export const checkProductExist = async (
+	product_id: string | number
+): Promise<boolean> => {
+	try {
+		const conn: PoolClient = await client.connect();
+		const sql = `SELECT * FROM products WHERE product_id=($1);`;
+		const result = await conn.query(sql, [product_id]);
+		conn.release();
+		if (result.rows[0]) return true;
+	} catch (err) {
+		return false;
+	}
+	return false;
+};
+
 export const create = async ({
 	product_name,
 	product_description,

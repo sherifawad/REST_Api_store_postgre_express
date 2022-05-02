@@ -2,13 +2,7 @@ import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { User } from "../typings/interface";
 import { UserQuery } from "../typings/types";
-import {
-	createInsert,
-	createInsertString,
-	createPatch,
-	createPatchString,
-	queryPrepare
-} from "../utils/db";
+import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
 export const index = async (): Promise<UserQuery[]> => {
 	try {
@@ -56,26 +50,26 @@ export const create = async ({
 
 		const sql = createInsert("users", out.keys);
 		const result: QueryResult<User> = await conn.query(sql, out.values);
-
-		// const sql = createInsertString<User>("user_id", {
-		// 	...(user_email && { user_email }),
-		// 	...(user_firstname && { user_firstname }),
-		// 	...(user_lastname && { user_lastname }),
-		// 	...(user_password && { user_password }),
-		// 	...(user_active && { user_active })
-		// });
-		// const inputs = [];
-		// if (user_email) inputs.push(user_email);
-		// if (user_firstname) inputs.push(user_firstname);
-		// if (user_lastname) inputs.push(user_lastname);
-		// if (user_password) inputs.push(user_password);
-		// if (user_active) inputs.push(user_active);
-		// const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
 		throw new Error(`user not created: ${err}`);
 	}
+};
+
+export const checkEmailExists = async (
+	user_email: string
+): Promise<boolean> => {
+	try {
+		const conn: PoolClient = await client.connect();
+		const sql = "SELECT * FROM users  WHERE user_email=($1)";
+		const result = await conn.query(sql, [user_email]);
+		conn.release();
+		if (result.rows[0]) return true;
+	} catch (err) {
+		return false;
+	}
+	return false;
 };
 
 export const patch = async ({
@@ -101,20 +95,6 @@ export const patch = async ({
 
 		const result = await conn.query(sql, out.values);
 
-		// const sql = createPatchString<User>("user_id", "users", `${user_id}`, {
-		// 	...(user_email && { user_email }),
-		// 	...(user_firstname && { user_firstname }),
-		// 	...(user_lastname && { user_lastname }),
-		// 	...(user_password && { user_password }),
-		// 	...(user_active && { user_active })
-		// });
-		// const inputs = [];
-		// if (user_email) inputs.push(user_email);
-		// if (user_firstname) inputs.push(user_firstname);
-		// if (user_lastname) inputs.push(user_lastname);
-		// if (user_password) inputs.push(user_password);
-		// if (user_active) inputs.push(user_active);
-		// const result = await conn.query(sql, inputs);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
