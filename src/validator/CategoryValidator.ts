@@ -5,12 +5,14 @@ export const CategoryValidator = {
 	// validate get with query parameters
 	checkCategoryCreate: [
 		body("category_name")
-			// if only white space throw error
-			.notEmpty({ ignore_whitespace: true })
+			.exists()
+			.not()
+			.isEmpty({ ignore_whitespace: true })
 			.withMessage("category name is empty or white space")
 	],
 	checkCategoryEdit: [
 		param("category_id")
+			.exists()
 			.not()
 			.isEmpty({ ignore_whitespace: true })
 			.trim()

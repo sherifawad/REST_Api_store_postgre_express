@@ -5,7 +5,7 @@ import {
 	categoryDeleteController,
 	categoryUpdateController,
 	categoryViewController
-} from "../controllers/cateforyController";
+} from "../controllers/categoryController";
 import validatorMiddleWare from "../middlewares/validatorMiddleWare";
 import { CategoryValidator } from "../validator/CategoryValidator";
 
@@ -15,7 +15,7 @@ const categoryRouter = Express.Router();
 categoryRouter.get("/", categoriesViewController);
 
 categoryRouter.get(
-	"/:id",
+	"/:category_id",
 	CategoryValidator.checkCategoryEdit,
 	validatorMiddleWare,
 	categoryViewController
@@ -29,14 +29,14 @@ categoryRouter.post(
 );
 
 categoryRouter.put(
-	"/:id",
+	"/:category_id",
 	CategoryValidator.checkCategoryEdit,
 	validatorMiddleWare,
 	categoryUpdateController
 );
 
 categoryRouter.delete(
-	"/:id",
+	"/:category_id",
 	CategoryValidator.checkCategoryEdit,
 	validatorMiddleWare,
 	categoryDeleteController

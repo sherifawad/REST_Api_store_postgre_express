@@ -14,9 +14,9 @@ export const categoryViewController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const { id } = req.params;
-		if (!id) throw new Error("No id");
-		const data: Category = await categoryShow(id);
+		const { category_id } = req.params;
+		if (!category_id) throw new Error("No category_id");
+		const data: Category = await categoryShow(category_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -97,10 +97,10 @@ export const categoryUpdateController = async (
 ): Promise<Response> => {
 	try {
 		const { category_name, category_description } = req.body;
-		const { id } = req.params;
-		if (!id) throw new Error("No id");
+		const { category_id } = req.params;
+		if (!category_id) throw new Error("No category_id");
 		const data = await categoryPatch({
-			category_id: parseInt(id, 10),
+			category_id: parseInt(category_id, 10),
 			category_name,
 			category_description
 		});
@@ -129,9 +129,9 @@ export const categoryDeleteController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const { id } = req.params;
-		if (!id) throw new Error("No id");
-		await categoryRemove(id);
+		const { category_id } = req.params;
+		if (!category_id) throw new Error("No category_id");
+		await categoryRemove(category_id);
 		return res.status(200).json({
 			status: 200,
 			message: "Deleted Successfully"

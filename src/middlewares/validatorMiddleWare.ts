@@ -10,6 +10,10 @@ const validatorMiddleWare = (
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		// if there are errors show first error
+		console.log(
+			"🚀 ~ file: validatorMiddleWare.ts ~ line 14 ~ errors.array()[0]",
+			errors.array()[0]
+		);
 		return res.status(400).json(errors.array()[0]);
 		// return res.status(400).json({ errors: errors.array() });
 	}
