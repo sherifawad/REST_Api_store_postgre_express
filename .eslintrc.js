@@ -92,7 +92,7 @@ module.exports = {
 		"max-classes-per-file": 0,
 		"operator-linebreak": 0,
 		"nonblock-statement-body-position": 0,
-		"generator-star-spacing": 0,
-		"camelcase": 0
+		"generator-star-spacing": 0
+		// "camelcase": 0
 	}
 };

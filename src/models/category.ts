@@ -2,15 +2,9 @@ import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
 import { Category } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
-import {
-	createInsert,
-	createInsertString,
-	createPatch,
-	createPatchString,
-	queryPrepare
-} from "../utils/db";
+import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
-export const index = async (): Promise<Category[]> => {
+export const categoryIndex = async (): Promise<Category[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "SELECT * FROM categories";
@@ -22,7 +16,7 @@ export const index = async (): Promise<Category[]> => {
 	}
 };
 
-export const show = async (category_id: string): Promise<Category> => {
+export const categoryShow = async (category_id: string): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "SELECT * FROM categories WHERE category_id=($1)";
@@ -38,7 +32,7 @@ export const show = async (category_id: string): Promise<Category> => {
 	}
 };
 
-export const create = async ({
+export const categoryCreate = async ({
 	category_name,
 	category_description
 }: CategoryQuery): Promise<Category> => {
@@ -51,15 +45,6 @@ export const create = async ({
 
 		const sql = createInsert("categories", out.keys);
 		const result: QueryResult<Category> = await conn.query(sql, out.values);
-		// const sql = createInsertString<Category>("categories", {
-		// 	...(category_name && { category_name }),
-		// 	...(category_description && {
-		// 		category_description
-		// 	})
-		// });
-		// const inputs = [];
-		// if (category_name) inputs.push(category_name);
-		// if (category_description) inputs.push(category_description);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -67,7 +52,7 @@ export const create = async ({
 	}
 };
 
-export const patch = async ({
+export const categoryPatch = async ({
 	category_id,
 	category_name,
 	category_description
@@ -87,18 +72,6 @@ export const patch = async ({
 		);
 
 		const result = await conn.query(sql, out.values);
-		// const sql = createPatchString<Category>(
-		// 	"category_id",
-		// 	"categories",
-		// 	`${category_id}`,
-		// 	{
-		// 		...(category_name && { category_name }),
-		// 		...(category_description && { category_description })
-		// 	}
-		// );
-		// const inputs = [];
-		// if (category_name) inputs.push(category_name);
-		// if (category_description) inputs.push(category_description);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -106,7 +79,9 @@ export const patch = async ({
 	}
 };
 
-export const Remove = async (category_id: string): Promise<Category> => {
+export const categoryRemove = async (
+	category_id: string
+): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "DELETE FROM categories WHERE category_id=($1)";
