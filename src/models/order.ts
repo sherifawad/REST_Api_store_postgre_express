@@ -4,7 +4,7 @@ import { Order, OrderProduct } from "../typings/interface";
 import { OrderQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
-export const index = async (): Promise<OrderQuery[]> => {
+export const orderIndex = async (): Promise<Order[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -32,7 +32,7 @@ export const index = async (): Promise<OrderQuery[]> => {
 
 		const data: Order[] = result.rows.map(row => ({
 			order_id: row.order_id,
-			order_date: row.order_date,
+			order_date: (row.order_date as unknown as Date).toISOString(),
 			user_id: row.user_id,
 			user: {
 				user_id: row.user_id,
@@ -61,11 +61,11 @@ export const index = async (): Promise<OrderQuery[]> => {
 	}
 };
 
-export const create = async ({
+export const orderCreate = async ({
 	user_id,
 	order_date,
 	order_products
-}: OrderQuery): Promise<Omit<Order, "order_products">> => {
+}: Omit<Order, "order_id">): Promise<Omit<Order, "order_products">> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -97,13 +97,19 @@ export const create = async ({
 		});
 
 		conn.release();
-		return result.rows[0];
+		const data: Omit<Order, "order_products"> = result.rows.map(row => ({
+			order_id: row.order_id,
+			order_date: (row.order_date as unknown as Date).toISOString(),
+			user_id: row.user_id
+		}))[0];
+
+		return data;
 	} catch (err) {
 		throw new Error(`Order not created: ${err}`);
 	}
 };
 
-export const patch = async ({
+export const orderPatch = async ({
 	order_id,
 	user_id,
 	order_date,
@@ -158,7 +164,16 @@ export const patch = async ({
 
 		conn.release();
 		if (result) {
-			return result.rows[0];
+			const data: Omit<Order, "order_products"> = result.rows.map(
+				row => ({
+					order_id: row.order_id,
+					order_date: (
+						row.order_date as unknown as Date
+					).toISOString(),
+					user_id: row.user_id
+				})
+			)[0];
+			return data;
 		}
 		return undefined;
 	} catch (err) {
@@ -166,7 +181,7 @@ export const patch = async ({
 	}
 };
 
-export const show = async (order_id: string): Promise<Order> => {
+export const orderShow = async (order_id: string): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -198,7 +213,7 @@ export const show = async (order_id: string): Promise<Order> => {
 
 		const data: Order = result.rows.map(row => ({
 			order_id: row.order_id,
-			order_date: row.order_date,
+			order_date: (row.order_date as unknown as Date).toISOString(),
 			user_id: row.user_id,
 			user: {
 				user_id: row.user_id,
@@ -227,7 +242,31 @@ export const show = async (order_id: string): Promise<Order> => {
 	}
 };
 
-export const Remove = async (order_id: string): Promise<Order> => {
+export const orderOnlyShow = async (
+	order_id: string
+): Promise<Omit<Order, "order_products">> => {
+	try {
+		const conn: PoolClient = await client.connect();
+
+		const sql = `
+                    SELECT *
+                    From orders
+                    WHERE order_id=($1);`;
+
+		const result = await conn.query(sql, [order_id]);
+		conn.release();
+		const data: Omit<Order, "order_products"> = result.rows.map(row => ({
+			order_id: row.order_id,
+			order_date: (row.order_date as unknown as Date).toISOString(),
+			user_id: row.user_id
+		}))[0];
+		return data;
+	} catch (err) {
+		throw new Error(`orders index : ${err}`);
+	}
+};
+
+export const orderRemove = async (order_id: string): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "DELETE FROM orders WHERE order_id=($1)";

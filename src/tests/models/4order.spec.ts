@@ -1,45 +1,63 @@
-import { create, index, patch, Remove, show } from "../../models/order";
+import {
+	orderCreate,
+	orderIndex,
+	orderOnlyShow,
+	orderPatch,
+	orderRemove,
+	orderShow
+} from "../../models/order";
+import { Order, OrderProduct } from "../../typings/interface";
 import { OrderQuery } from "../../typings/types";
 
 describe("Order Model", () => {
+	const newOrder: Order = {
+		order_id: -1,
+		user_id: 1,
+		order_date: new Date().toISOString(),
+		order_products: [
+			{
+				order_product_quantity: 5,
+				product_id: 1
+			} as unknown as OrderProduct
+		]
+	};
+
 	it("should have an index method", () => {
-		expect(index).toBeDefined();
+		expect(orderIndex).toBeDefined();
 	});
 
 	it("should have a create method", () => {
-		expect(create).toBeDefined();
+		expect(orderCreate).toBeDefined();
+	});
+
+	it("should have a show method", () => {
+		expect(orderShow).toBeDefined();
+	});
+
+	it("should have a update method", () => {
+		expect(orderPatch).toBeDefined();
+	});
+
+	it("should have a remove method", () => {
+		expect(orderRemove).toBeDefined();
 	});
 
 	it("create method should add a order", async () => {
-		const result = await create({
-			user_id: 1,
-			order_products: [
-				{
-					order_product_quantity: 5,
-					product_id: 1
-				}
-			],
-			order_date: new Date(
-				"Sat Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-			)
-		} as unknown as OrderQuery);
-		expect(result).toEqual({
-			order_id: 1,
-			order_date: new Date(
-				"Sat Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-			),
-			user_id: 1
-		});
+		const result = await orderCreate({
+			user_id: newOrder.user_id,
+			order_date: newOrder.order_date,
+			order_products: newOrder.order_products
+		} as unknown as Omit<Order, "order_id">);
+		newOrder.order_id = result.order_id;
+		expect(result).toEqual(await orderOnlyShow(`${newOrder.order_id}`));
 	});
 
 	it("index method should return a list of orders", async () => {
-		const result = await index();
+		const result = await orderIndex();
 		expect(result).toEqual([
 			{
 				order_id: 1,
-				order_date: new Date(
-					"Sat Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-				),
+				order_date: newOrder.order_date,
 				user_id: 1,
 				user: {
 					user_id: 1,
@@ -65,24 +83,8 @@ describe("Order Model", () => {
 		]);
 	});
 
-	it("patch method should patch a order date", async () => {
-		const result = await patch({
-			order_id: 1,
-			order_date: new Date(
-				"Sun Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-			)
-		} as unknown as OrderQuery);
-		expect(result).toEqual({
-			order_id: 1,
-			order_date: new Date(
-				"Sun Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-			),
-			user_id: 1
-		});
-	});
-
 	it("patch method should patch a order product quantity", async () => {
-		const result = await patch({
+		const result = await orderPatch({
 			order_id: 1,
 			order_products: [
 				{
@@ -99,13 +101,11 @@ describe("Order Model", () => {
 	});
 
 	it("show method should return the correct product", async () => {
-		const result = await show("1");
+		const result = await orderShow("1");
 
 		expect(result).toEqual({
 			order_id: 1,
-			order_date: new Date(
-				"Sun Apr 30 2022 00:00:00 GMT+0200 (Eastern European Standard Time)"
-			),
+			order_date: newOrder.order_date,
 			user_id: 1,
 			user: {
 				user_id: 1,
@@ -140,8 +140,8 @@ describe("Order Model", () => {
 	});
 
 	it("delete method should remove the order", async () => {
-		await Remove("1");
-		const result = await index();
+		await orderRemove("1");
+		const result = await orderIndex();
 
 		expect(result).toEqual([]);
 	});

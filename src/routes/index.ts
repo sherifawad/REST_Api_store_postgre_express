@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import categoryRouter from "./categoryRoute";
+import orderRouter from "./orderRoute";
 import productRouter from "./productRoute";
 import userRouter from "./userRoute";
 
@@ -12,5 +13,6 @@ routes.get("/", (_req: Request, res: Response): void => {
 routes.use("/category", categoryRouter);
 routes.use("/product", productRouter);
 routes.use("/user", userRouter);
+routes.use("/order", orderRouter);
 
 export default routes;

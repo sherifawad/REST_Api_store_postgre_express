@@ -2,7 +2,7 @@ import { body, param } from "express-validator";
 import { checkProductExist } from "../models/product";
 import { OrderProduct } from "../typings/interface";
 
-export const orderCreateValidator = () => [
+export const orderCreateValidator = [
 	body("user_id")
 		.not()
 		.isEmpty({ ignore_whitespace: true })
@@ -27,13 +27,21 @@ export const orderCreateValidator = () => [
 		.withMessage("Not valid Products")
 ];
 
-export const orderEditValidator = () => [
+export const orderEditValidator = [
 	param("order_id")
 		.not()
 		.isEmpty({ ignore_whitespace: true })
 		.trim()
 		.escape()
 		.withMessage("there is no order_id"),
+
+	body("user_id")
+		.optional()
+		.not()
+		.isEmpty({ ignore_whitespace: true })
+		.trim()
+		.escape()
+		.withMessage("there is no user_id"),
 
 	body("order_products")
 		.optional()

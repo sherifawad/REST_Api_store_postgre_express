@@ -15,6 +15,7 @@ describe("Products Endpoint /api/product", () => {
 
 	it("POST should create new product POST /api/product", done => {
 		req.post("/api/product")
+			.set("Content-Type", "application/json")
 			.send({
 				product_name: newProduct.product_name,
 				product_description: newProduct.product_description,

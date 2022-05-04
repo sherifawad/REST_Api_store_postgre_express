@@ -13,6 +13,7 @@ describe("Category Endpoint /api/category", () => {
 
 	it("POST should create new category POST /api/category", done => {
 		req.post("/api/category")
+			.set("Content-Type", "application/json")
 			.send({
 				category_name: newCategory.category_name,
 				category_description: newCategory.category_description

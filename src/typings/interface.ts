@@ -30,7 +30,7 @@ export interface OrderProduct extends Product, Omit<Order, "order_products"> {
 }
 export interface Order {
 	order_id: number;
-	order_date?: Date;
+	order_date?: string;
 	user_id: number;
 	user?: Omit<User, "user_password">;
 	order_products: OrderProduct[];
