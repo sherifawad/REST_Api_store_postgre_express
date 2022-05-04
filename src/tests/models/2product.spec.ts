@@ -1,36 +1,42 @@
-import { create, index, patch, Remove, show } from "../../models/product";
+import {
+	productCreate,
+	productIndex,
+	productPatch,
+	productRemove,
+	productShow
+} from "../../models/product";
 import { ProductQuery } from "../../typings/types";
 
 describe("Product Model", () => {
 	it("should have an index method", () => {
-		expect(index).toBeDefined();
+		expect(productIndex).toBeDefined();
 	});
 
 	it("should have a show method", () => {
-		expect(show).toBeDefined();
+		expect(productShow).toBeDefined();
 	});
 
 	it("should have a create method", () => {
-		expect(create).toBeDefined();
+		expect(productCreate).toBeDefined();
 	});
 
 	it("should have a update method", () => {
-		expect(patch).toBeDefined();
+		expect(productPatch).toBeDefined();
 	});
 
 	it("should have a delete method", () => {
-		expect(Remove).toBeDefined();
+		expect(productRemove).toBeDefined();
 	});
 
 	it("create method should add a product", async () => {
-		const result = await create({
+		const result = await productCreate({
 			product_name: "Nokia 3310",
 			product_description: "a mobile made from strong materials",
 			product_price: 3310,
 			category_id: 1
 		} as unknown as ProductQuery);
 
-		await create({
+		await productCreate({
 			product_name: "Nokia 3.21 plus",
 			product_description: "SmartNokia Phone",
 			product_price: 2150,
@@ -46,7 +52,7 @@ describe("Product Model", () => {
 	});
 
 	it("index method should return a list of products", async () => {
-		const result = await index();
+		const result = await productIndex();
 		expect(result).toEqual([
 			{
 				product_id: 1,
@@ -66,7 +72,7 @@ describe("Product Model", () => {
 	});
 
 	it("show method should return the correct product", async () => {
-		const result = await show("1");
+		const result = await productShow("1");
 
 		expect(result).toEqual({
 			product_id: 1,
@@ -83,7 +89,7 @@ describe("Product Model", () => {
 	});
 
 	it("show method should patch product", async () => {
-		const result = await patch({
+		const result = await productPatch({
 			product_id: 1,
 			product_price: 300
 		} as unknown as ProductQuery);
@@ -97,7 +103,7 @@ describe("Product Model", () => {
 	});
 
 	// it("delete method should remove the product", async () => {
-	// 	await Remove("1");
+	// 	await productRemove("1");
 	// 	const result = await index();
 
 	// 	expect(result).toEqual([]);

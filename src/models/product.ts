@@ -4,7 +4,7 @@ import { Product } from "../typings/interface";
 import { ProductQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
-export const index = async (): Promise<Product[]> => {
+export const productIndex = async (): Promise<Product[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = `SELECT * FROM products`;
@@ -16,7 +16,7 @@ export const index = async (): Promise<Product[]> => {
 	}
 };
 
-export const show = async (product_id: string): Promise<Product> => {
+export const productShow = async (product_id: string): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = `SELECT products.*, 
@@ -62,7 +62,7 @@ export const checkProductExist = async (
 	return false;
 };
 
-export const create = async ({
+export const productCreate = async ({
 	product_name,
 	product_description,
 	product_price,
@@ -87,7 +87,7 @@ export const create = async ({
 	}
 };
 
-export const patch = async ({
+export const productPatch = async ({
 	product_id,
 	product_name,
 	product_description,
@@ -119,7 +119,7 @@ export const patch = async ({
 	}
 };
 
-export const Remove = async (product_id: string): Promise<Product> => {
+export const productRemove = async (product_id: string): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "DELETE FROM products WHERE product_id=($1)";

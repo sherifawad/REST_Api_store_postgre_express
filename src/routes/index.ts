@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import categoryRouter from "./categoryRoute";
+import productRouter from "./productRoute";
 
 const routes = express.Router();
 
@@ -8,5 +9,6 @@ routes.get("/", (_req: Request, res: Response): void => {
 });
 
 routes.use("/category", categoryRouter);
+routes.use("/product", productRouter);
 
 export default routes;

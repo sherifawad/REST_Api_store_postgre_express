@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 
-export const productCreateValidator = () => [
+export const productCreateValidator = [
 	body("product_name")
 		.exists()
 		.not()
@@ -32,7 +32,7 @@ export const productCreateValidator = () => [
 		.withMessage("Invalid user category_id")
 ];
 
-export const productEditValidator = () => [
+export const productEditValidator = [
 	param("product_id")
 		.not()
 		.isEmpty()
