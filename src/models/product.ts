@@ -10,13 +10,7 @@ export const index = async (): Promise<Product[]> => {
 		const sql = `SELECT * FROM products`;
 		const result: QueryResult<Product> = await conn.query(sql);
 		conn.release();
-		return result.rows.map(row => ({
-			product_id: row.product_id,
-			product_name: row.product_name,
-			product_description: row.product_description,
-			product_price: row.product_price,
-			category_id: row.category_id
-		}));
+		return result.rows;
 	} catch (err) {
 		throw new Error(`categories index : ${err}`);
 	}

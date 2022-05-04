@@ -1,6 +1,6 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-import { Category } from "../typings/interface";
+import { Category, Product } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
@@ -25,6 +25,39 @@ export const categoryShow = async (category_id: string): Promise<Category> => {
 		]);
 		conn.release();
 		return result.rows[0];
+	} catch (err) {
+		throw new Error(
+			`Category with id: ${category_id} does not exist: ${err}`
+		);
+	}
+};
+
+export const categoryProductsShow = async (
+	category_id: string
+): Promise<Category> => {
+	try {
+		const conn: PoolClient = await client.connect();
+
+		const sql = `SELECT c.*, p.*
+		FROM categories AS c
+		INNER JOIN products As p
+		ON c.category_id=p.category_id
+		WHERE c.category_id=($1) 
+        ORDER BY p.product_id;`;
+
+		const result = await conn.query(sql, [category_id]);
+		conn.release();
+		return {
+			category_id: result.rows[0].category_id,
+			category_name: result.rows[0].category_name,
+			category_description: result.rows[0].category_description,
+			category_products: result.rows.map(productRow => ({
+				product_id: productRow.product_id,
+				product_name: productRow.product_name,
+				product_description: productRow.product_description,
+				product_price: productRow.product_price
+			}))
+		};
 	} catch (err) {
 		throw new Error(
 			`Category with id: ${category_id} does not exist: ${err}`

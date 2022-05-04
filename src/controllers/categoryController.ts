@@ -4,6 +4,7 @@ import {
 	categoryCreate,
 	categoryIndex,
 	categoryPatch,
+	categoryProductsShow,
 	categoryRemove,
 	categoryShow
 } from "../models/category";
@@ -17,6 +18,33 @@ export const categoryViewController = async (
 		const { category_id } = req.params;
 		if (!category_id) throw new Error("No category_id");
 		const data: Category = await categoryShow(category_id);
+		if (!data) throw new Error("there are no data");
+		return res.status(200).json({
+			status: 200,
+			data
+		});
+	} catch (error) {
+		// check if instance of error not throw string but => throw new Error("")
+		if (error instanceof Error) {
+			return res.status(400).json({
+				message: error.stack
+			});
+		}
+		// error is string
+		return res.status(500).json({
+			message: `${error}`
+		});
+	}
+};
+
+export const categoryProductsViewController = async (
+	req: Request,
+	res: Response
+): Promise<Response> => {
+	try {
+		const { category_id } = req.params;
+		if (!category_id) throw new Error("No category_id");
+		const data: Category = await categoryProductsShow(category_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,

@@ -1,5 +1,9 @@
 import supertest from "supertest";
-import { categoryIndex, categoryShow } from "../../models/category";
+import {
+	categoryIndex,
+	categoryProductsShow,
+	categoryShow
+} from "../../models/category";
 import { app } from "../../server";
 import { Category } from "../../typings/interface";
 
@@ -36,6 +40,24 @@ describe("Category Endpoint /api/category", () => {
 				expect(response.body.data).toBeTruthy();
 				expect(response.body.data).toEqual(
 					await categoryShow(`${newCategory.category_id}`)
+				);
+				done();
+			});
+	});
+
+	it(" GET /api/category/:category_id/products should return correct category with products", done => {
+		req.get(`/api/category/1/products`)
+			.expect(200)
+			.then(async response => {
+				expect(response.body.data).toBeTruthy();
+				expect(response.body.data.category_products).toEqual(
+					jasmine.any(Array)
+				);
+				expect(
+					response.body.data.category_products.length
+				).toBeTruthy();
+				expect(response.body.data).toEqual(
+					await categoryProductsShow("1")
 				);
 				done();
 			});

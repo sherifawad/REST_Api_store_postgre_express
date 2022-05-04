@@ -3,6 +3,7 @@ import {
 	categoriesViewController,
 	categoryAddController,
 	categoryDeleteController,
+	categoryProductsViewController,
 	categoryUpdateController,
 	categoryViewController
 } from "../controllers/categoryController";
@@ -19,6 +20,13 @@ categoryRouter.get(
 	CategoryValidator.checkCategoryEdit,
 	validatorMiddleWare,
 	categoryViewController
+);
+
+categoryRouter.get(
+	"/:category_id/products",
+	CategoryValidator.checkCategoryEdit,
+	validatorMiddleWare,
+	categoryProductsViewController
 );
 
 categoryRouter.post(
