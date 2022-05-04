@@ -1,6 +1,6 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-import { Category, Product } from "../typings/interface";
+import { Category } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
@@ -30,6 +30,21 @@ export const categoryShow = async (category_id: string): Promise<Category> => {
 			`Category with id: ${category_id} does not exist: ${err}`
 		);
 	}
+};
+
+export const checkCategoryExist = async (
+	category_id: string | number
+): Promise<boolean> => {
+	try {
+		const conn: PoolClient = await client.connect();
+		const sql = `SELECT 1 FROM categories WHERE category_id=($1) LIMIT 1;`;
+		const result = await conn.query(sql, [category_id]);
+		conn.release();
+		if (result.rows[0]) return true;
+	} catch (err) {
+		return false;
+	}
+	return false;
 };
 
 export const categoryProductsShow = async (

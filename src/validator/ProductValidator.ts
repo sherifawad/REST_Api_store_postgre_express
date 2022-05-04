@@ -1,4 +1,5 @@
 import { body, param } from "express-validator";
+import { checkCategoryExist } from "../models/category";
 
 export const productCreateValidator = [
 	body("product_name")
@@ -29,6 +30,8 @@ export const productCreateValidator = [
 		.isEmpty({ ignore_whitespace: true })
 		.trim()
 		.escape()
+		.bail()
+		.custom((value: string | number) => checkCategoryExist(value))
 		.withMessage("Invalid user category_id")
 ];
 
@@ -68,5 +71,7 @@ export const productEditValidator = [
 		.isEmpty({ ignore_whitespace: true })
 		.trim()
 		.escape()
+		.bail()
+		.custom((value: string | number) => checkCategoryExist(value))
 		.withMessage("Invalid user category_id")
 ];
