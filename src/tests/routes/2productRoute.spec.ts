@@ -52,7 +52,7 @@ describe("Products Endpoint /api/product", () => {
 			});
 	});
 
-	it(" GET /api/product should return list of categories", done => {
+	it(" GET /api/product should return list of products", done => {
 		req.get("/api/product")
 			.expect(200)
 			.then(async response => {

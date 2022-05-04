@@ -4,12 +4,13 @@ import { User } from "../typings/interface";
 import { UserQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 
-export const index = async (): Promise<UserQuery[]> => {
+export const userIndex = async (): Promise<Omit<User, "user_password">[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql =
 			"SELECT user_id, user_email, user_firstname, user_lastname FROM users  WHERE user_active";
-		const result: QueryResult<UserQuery> = await conn.query(sql);
+		const result: QueryResult<Omit<User, "user_password">> =
+			await conn.query(sql);
 		conn.release();
 		return result.rows;
 	} catch (err) {
@@ -17,7 +18,7 @@ export const index = async (): Promise<UserQuery[]> => {
 	}
 };
 
-export const show = async (user_id: string): Promise<User> => {
+export const userShow = async (user_id: string): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql =
@@ -30,7 +31,7 @@ export const show = async (user_id: string): Promise<User> => {
 	}
 };
 
-export const create = async ({
+export const userCreate = async ({
 	user_email,
 	user_firstname,
 	user_lastname,
@@ -62,7 +63,7 @@ export const checkEmailExists = async (
 ): Promise<boolean> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "SELECT * FROM users  WHERE user_email=($1)";
+		const sql = "SELECT 1 FROM users WHERE user_email=($1) LIMIT 1";
 		const result = await conn.query(sql, [user_email]);
 		conn.release();
 		if (result.rows[0]) return true;
@@ -72,7 +73,7 @@ export const checkEmailExists = async (
 	return false;
 };
 
-export const patch = async ({
+export const userPatch = async ({
 	user_id,
 	user_email,
 	user_firstname,
@@ -103,7 +104,7 @@ export const patch = async ({
 };
 
 // we won't delete the user so we set user active status to false
-export const deActivate = async (user_id: string): Promise<User> => {
+export const userDeActivate = async (user_id: string): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "UPDATE users SET user_active = false WHERE user_id = $1";
@@ -115,7 +116,7 @@ export const deActivate = async (user_id: string): Promise<User> => {
 	}
 };
 
-// export const Remove = async (user_id: string): Promise<User> => {
+// export const userRemove = async (user_id: string): Promise<User> => {
 // 	try {
 // 		const conn: PoolClient = await client.connect();
 // 		const sql = "DELETE FROM users WHERE user_id=($1)";
