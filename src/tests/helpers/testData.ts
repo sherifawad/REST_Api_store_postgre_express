@@ -51,7 +51,7 @@ const testData = {
 				order_product_id: -1,
 				order_id: -1,
 				user_id: 1,
-				order_product_quantity: 5,
+				order_product_quantity: 50,
 				product_id: 1
 			}
 		]

@@ -24,9 +24,13 @@ export interface Product {
 	category?: Category;
 }
 
-export interface OrderProduct extends Product, Omit<Order, "order_products"> {
+export interface OrderProduct {
 	order_product_id: string | number;
 	order_product_quantity: number;
+	product_id: string | number;
+	product?: Product;
+	order_id?: string | number;
+	order?: Order;
 }
 export interface Order {
 	order_id: string | number;

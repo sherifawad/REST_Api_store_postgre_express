@@ -44,15 +44,18 @@ describe("Order Model", () => {
 		);
 	});
 
-	it("show method should return the correct product", async () => {
-		const result = await orderShow(testData.dataBaseTestOrder.order_id);
+	it("show order detauls method should return the correct order", async () => {
+		const result = await showOrderDetails(
+			testData.dataBaseTestOrder.order_id
+		);
 		console.log(
-			"🚀 ~ file: 4order.spec.ts ~ line 48 ~ it ~ result",
-			await showOrderDetails(1)
+			"🚀 ~ file: 4order.spec.ts ~ line 48 ~ it ~ showOrderDetails",
+			result
 		);
-		expect(result).toEqual(
-			_.omit(testData.dataBaseTestOrder, ["order_products"])
-		);
+		expect(result).toEqual({
+			...testData.dataBaseTestOrder,
+			user: testData.dataBaseTestUser
+		});
 	});
 
 	it("index method should return a list of orders", async () => {

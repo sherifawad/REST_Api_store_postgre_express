@@ -213,16 +213,17 @@ export const showOrderDetails = async (
 			},
 			order_products: result.rows.map(productRow => ({
 				order_product_id: productRow.order_product_id,
-				order_id: productRow.order_id,
 				order_product_quantity: parseInt(
 					productRow.order_product_quantity as unknown as string,
 					10
 				),
 				product_id: productRow.product_id,
-				product_name: productRow.product_name,
-				product_description: productRow.product_description,
-				product_price: productRow.product_price,
-				user_id: user.user_id
+				product: {
+					product_id: productRow.product_id,
+					product_name: productRow.product_name,
+					product_description: productRow.product_description,
+					product_price: productRow.product_price
+				}
 			}))
 		};
 		return data;
