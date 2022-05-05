@@ -26,6 +26,21 @@ const testData = {
 		category_id: -1,
 		category_name: "Computers&Laps",
 		category_description: "Computers&Laps category description"
+	},
+
+	dataBaseTestProduct: {
+		product_id: -1,
+		product_name: "Nokia 3310",
+		product_description: "a mobile made from strong materials",
+		product_price: "3310.00",
+		category_id: 1
+	},
+	apiTestProduct: {
+		product_id: -1,
+		product_name: "laptop",
+		product_description: "DELL",
+		product_price: "6000.00",
+		category_id: 2
 	}
 };
 

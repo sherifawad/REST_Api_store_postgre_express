@@ -12,7 +12,8 @@ export const productCreateValidator = [
 
 	body("product_price")
 		.exists()
-		.isNumeric({ no_symbols: true })
+		.not()
+		.isEmpty({ ignore_whitespace: true })
 		.trim()
 		.escape()
 		.withMessage("Invalid Product price"),
@@ -53,7 +54,8 @@ export const productEditValidator = [
 
 	body("product_price")
 		.optional()
-		.isNumeric({ no_symbols: true })
+		.not()
+		.isEmpty({ ignore_whitespace: true })
 		.trim()
 		.escape()
 		.withMessage("Invalid Product price"),

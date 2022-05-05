@@ -7,7 +7,6 @@ import {
 	categoryUpdateController,
 	categoryViewController
 } from "../controllers/categoryController";
-import authenticationMiddleware from "../middlewares/authenticaionMiddleware";
 import validatorMiddleWare from "../middlewares/validatorMiddleWare";
 import { CategoryValidator } from "../validator/CategoryValidator";
 

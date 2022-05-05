@@ -1,25 +1,19 @@
+import * as _ from "lodash";
 import { categoryProductsShow } from "../../models/category";
+import testData from "../helpers/testData";
 
 describe("Extra", () => {
 	it("Category products method should return a list of products with specified category Id", async () => {
-		const result = await categoryProductsShow("1");
+		const result = await categoryProductsShow(
+			testData.dataBaseTestCategory.category_id
+		);
 		expect(result).toEqual({
-			category_id: 1,
-			category_name: "Electronics patched",
-			category_description: "electronic category description",
+			category_id: testData.dataBaseTestCategory.category_id,
+			category_name: testData.dataBaseTestCategory.category_name,
+			category_description:
+				testData.dataBaseTestCategory.category_description,
 			category_products: [
-				{
-					product_id: 1,
-					product_name: "Nokia 3310",
-					product_description: "a mobile made from strong materials",
-					product_price: "300.00"
-				},
-				{
-					product_id: 2,
-					product_name: "Nokia 3.21 plus",
-					product_description: "SmartNokia Phone",
-					product_price: "2150.00"
-				}
+				_.omit(testData.dataBaseTestProduct, ["category_id"])
 			]
 		});
 	});

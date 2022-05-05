@@ -12,7 +12,7 @@ routes.get("/", (_req: Request, res: Response): void => {
 });
 
 routes.use("/category", authenticationMiddleware, categoryRouter);
-routes.use("/product", productRouter);
+routes.use("/product", authenticationMiddleware, productRouter);
 routes.use("/user", userRouter);
 routes.use("/order", orderRouter);
 

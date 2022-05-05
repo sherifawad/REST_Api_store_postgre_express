@@ -6,6 +6,7 @@ import {
 	productShow
 } from "../../models/product";
 import { ProductQuery } from "../../typings/types";
+import testData from "../helpers/testData";
 
 describe("Product Model", () => {
 	it("should have an index method", () => {
@@ -30,76 +31,45 @@ describe("Product Model", () => {
 
 	it("create method should add a product", async () => {
 		const result = await productCreate({
-			product_name: "Nokia 3310",
-			product_description: "a mobile made from strong materials",
-			product_price: 3310,
-			category_id: 1
+			product_name: testData.dataBaseTestProduct.product_name,
+			product_description:
+				testData.dataBaseTestProduct.product_description,
+			product_price: testData.dataBaseTestProduct.product_price,
+			category_id: testData.dataBaseTestProduct.category_id
 		} as unknown as ProductQuery);
-
-		await productCreate({
-			product_name: "Nokia 3.21 plus",
-			product_description: "SmartNokia Phone",
-			product_price: 2150,
-			category_id: 1
-		} as unknown as ProductQuery);
-		expect(result).toEqual({
-			product_id: 1,
-			product_name: "Nokia 3310",
-			product_description: "a mobile made from strong materials",
-			product_price: "3310.00",
-			category_id: 1
-		});
+		testData.dataBaseTestProduct.product_id =
+			result.product_id as unknown as number;
+		expect(result).toEqual(testData.dataBaseTestProduct);
 	});
 
 	it("index method should return a list of products", async () => {
 		const result = await productIndex();
-		expect(result).toEqual([
-			{
-				product_id: 1,
-				product_name: "Nokia 3310",
-				product_description: "a mobile made from strong materials",
-				product_price: "3310.00",
-				category_id: 1
-			},
-			{
-				product_id: 2,
-				product_name: "Nokia 3.21 plus",
-				product_description: "SmartNokia Phone",
-				product_price: "2150.00",
-				category_id: 1
-			}
-		]);
+		expect(result).toEqual([testData.dataBaseTestProduct]);
 	});
 
 	it("show method should return the correct product", async () => {
-		const result = await productShow("1");
+		const result = await productShow(
+			testData.dataBaseTestProduct.product_id
+		);
 
 		expect(result).toEqual({
-			product_id: 1,
-			product_name: "Nokia 3310",
-			product_description: "a mobile made from strong materials",
-			product_price: "3310.00",
-			category_id: 1,
+			...testData.dataBaseTestProduct,
 			category: {
-				category_id: 1,
-				category_name: "Electronics patched",
-				category_description: "electronic category description"
+				category_id: testData.dataBaseTestCategory.category_id,
+				category_name: testData.dataBaseTestCategory.category_name,
+				category_description:
+					testData.dataBaseTestCategory.category_description
 			}
 		});
 	});
 
 	it("show method should patch product", async () => {
+		testData.dataBaseTestProduct.product_price = "300.00";
 		const result = await productPatch({
-			product_id: 1,
-			product_price: 300
+			product_id: testData.dataBaseTestProduct.product_id,
+			product_price: testData.dataBaseTestProduct.product_price
 		} as unknown as ProductQuery);
-		expect(result).toEqual({
-			product_id: 1,
-			product_name: "Nokia 3310",
-			product_description: "a mobile made from strong materials",
-			product_price: "300.00",
-			category_id: 1
-		});
+		expect(result).toEqual(testData.dataBaseTestProduct);
 	});
 
 	// it("delete method should remove the product", async () => {
