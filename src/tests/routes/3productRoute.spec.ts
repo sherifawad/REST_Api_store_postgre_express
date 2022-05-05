@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { productIndex, productShow } from "../../models/product";
 import { app } from "../../server";
 import { Product } from "../../typings/interface";
+import testData from "../helpers/testData";
 
 describe("Products Endpoint /api/product", () => {
 	const req = supertest(app);
@@ -16,6 +17,7 @@ describe("Products Endpoint /api/product", () => {
 	it("POST should create new product POST /api/product", done => {
 		req.post("/api/product")
 			.set("Content-Type", "application/json")
+			.set("X-ACCESS-TOKEN", testData.apiTestUserToken)
 			.send({
 				product_name: newProduct.product_name,
 				product_description: newProduct.product_description,

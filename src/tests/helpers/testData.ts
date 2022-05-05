@@ -15,7 +15,18 @@ const testData = {
 		user_password: "password",
 		user_active: true
 	},
-	apiTestUserToken: ""
+	apiTestUserToken: "",
+
+	dataBaseTestCategory: {
+		category_id: -1,
+		category_name: "Electronics",
+		category_description: "electronic category description"
+	},
+	apiTestCategory: {
+		category_id: -1,
+		category_name: "Computers&Laps",
+		category_description: "Computers&Laps category description"
+	}
 };
 
 export default testData;

@@ -6,6 +6,7 @@ import {
 	categoryShow
 } from "../../models/category";
 import { CategoryQuery } from "../../typings/types";
+import testData from "../helpers/testData";
 
 describe("Category Model", () => {
 	it("should have an index method", () => {
@@ -30,46 +31,34 @@ describe("Category Model", () => {
 
 	it("create method should add a category", async () => {
 		const result = await categoryCreate({
-			category_name: "Electronics",
-			category_description: "electronic category description"
+			category_name: testData.dataBaseTestCategory.category_name,
+			category_description:
+				testData.dataBaseTestCategory.category_description
 		} as unknown as CategoryQuery);
-		expect(result).toEqual({
-			category_id: 1,
-			category_name: "Electronics",
-			category_description: "electronic category description"
-		});
+		testData.dataBaseTestCategory.category_id =
+			result.category_id as unknown as number;
+		expect(result).toEqual(testData.dataBaseTestCategory);
 	});
 
 	it("index method should return a list of categories", async () => {
 		const result = await categoryIndex();
-		expect(result).toEqual([
-			{
-				category_id: 1,
-				category_name: "Electronics",
-				category_description: "electronic category description"
-			}
-		]);
+		expect(result).toEqual([testData.dataBaseTestCategory]);
 	});
 
 	it("show method should return the correct category", async () => {
-		const result = await categoryShow("1");
-		expect(result).toEqual({
-			category_id: 1,
-			category_name: "Electronics",
-			category_description: "electronic category description"
-		});
+		const result = await categoryShow(
+			testData.dataBaseTestCategory.category_id
+		);
+		expect(result).toEqual(testData.dataBaseTestCategory);
 	});
 
 	it("show method should patch category", async () => {
+		testData.dataBaseTestCategory.category_name = "Electronics patched";
 		const result = await categoryPatch({
-			category_id: 1,
-			category_name: "Electronics patched"
+			category_id: testData.dataBaseTestCategory.category_id,
+			category_name: testData.dataBaseTestCategory.category_name
 		} as unknown as CategoryQuery);
-		expect(result).toEqual({
-			category_id: 1,
-			category_name: "Electronics patched",
-			category_description: "electronic category description"
-		});
+		expect(result).toEqual(testData.dataBaseTestCategory);
 	});
 
 	// it("delete method should remove the category", async () => {

@@ -16,7 +16,9 @@ export const categoryIndex = async (): Promise<Category[]> => {
 	}
 };
 
-export const categoryShow = async (category_id: string): Promise<Category> => {
+export const categoryShow = async (
+	category_id: string | number
+): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "SELECT * FROM categories WHERE category_id=($1)";
