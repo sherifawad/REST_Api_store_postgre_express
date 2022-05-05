@@ -16,7 +16,9 @@ export const productIndex = async (): Promise<Product[]> => {
 	}
 };
 
-export const productShow = async (product_id: string): Promise<Product> => {
+export const productShow = async (
+	product_id: string | number
+): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = `SELECT products.*, 
@@ -120,7 +122,9 @@ export const productPatch = async ({
 	}
 };
 
-export const productRemove = async (product_id: string): Promise<Product> => {
+export const productRemove = async (
+	product_id: string | number
+): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "DELETE FROM products WHERE product_id=($1)";

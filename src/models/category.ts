@@ -48,7 +48,7 @@ export const checkCategoryExist = async (
 };
 
 export const categoryProductsShow = async (
-	category_id: string
+	category_id: string | number
 ): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
@@ -128,7 +128,7 @@ export const categoryPatch = async ({
 };
 
 export const categoryRemove = async (
-	category_id: string
+	category_id: string | number
 ): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();

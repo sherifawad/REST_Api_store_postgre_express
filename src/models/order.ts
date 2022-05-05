@@ -181,7 +181,7 @@ export const orderPatch = async ({
 	}
 };
 
-export const orderShow = async (order_id: string): Promise<Order> => {
+export const orderShow = async (order_id: string | number): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -266,7 +266,9 @@ export const orderOnlyShow = async (
 	}
 };
 
-export const orderRemove = async (order_id: string): Promise<Order> => {
+export const orderRemove = async (
+	order_id: string | number
+): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "DELETE FROM orders WHERE order_id=($1)";

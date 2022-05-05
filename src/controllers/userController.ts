@@ -66,13 +66,19 @@ export const userAddController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const { user_firstname, user_lastname, user_email, user_password } =
-			req.body;
+		const {
+			user_firstname,
+			user_lastname,
+			user_email,
+			user_password,
+			user_active
+		} = req.body;
 		const data: User = await userCreate({
 			user_firstname,
 			user_lastname,
 			user_email,
-			user_password
+			user_password,
+			user_active
 		});
 		if (!data) throw new Error("there are no data");
 		return res.status(201).json({

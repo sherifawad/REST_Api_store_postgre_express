@@ -1,4 +1,6 @@
+/* eslint-disable indent */
 import { PoolClient, QueryResult } from "pg";
+import bcrypt from "bcrypt";
 import client from "../services/connection";
 import { User } from "../typings/interface";
 import { UserQuery } from "../typings/types";
@@ -18,7 +20,7 @@ export const userIndex = async (): Promise<Omit<User, "user_password">[]> => {
 	}
 };
 
-export const userShow = async (user_id: string): Promise<User> => {
+export const userShow = async (user_id: string | number): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql =
@@ -37,15 +39,18 @@ export const userCreate = async ({
 	user_lastname,
 	user_password,
 	user_active
-}: UserQuery): Promise<User> => {
+}: Omit<User, "user_id">): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		// TODO: implement jwt authentication
+		const salt = await bcrypt.genSalt(
+			parseInt(process.env.SALT_ROUNDS || "10", 10)
+		);
+		const hashedPassword = await bcrypt.hash(user_password, salt);
 		const out = queryPrepare<User>({
 			user_email,
 			user_firstname,
 			user_lastname,
-			user_password,
+			user_password: hashedPassword,
 			user_active
 		});
 
@@ -84,12 +89,19 @@ export const userPatch = async ({
 	try {
 		const conn: PoolClient = await client.connect();
 
+		const salt = await bcrypt.genSalt(
+			parseInt(process.env.SALT_ROUNDS || "10", 10)
+		);
+		const hashedPassword = user_password
+			? await bcrypt.hash(user_password, salt)
+			: user_password;
+
 		const out = queryPrepare<User>({
 			user_id,
 			user_email,
 			user_firstname,
 			user_lastname,
-			user_password,
+			user_password: hashedPassword,
 			user_active
 		});
 		const sql = createPatch("user_id", "users", `${user_id}`, out.keys);
@@ -104,7 +116,9 @@ export const userPatch = async ({
 };
 
 // we won't delete the user so we set user active status to false
-export const userDeActivate = async (user_id: string): Promise<User> => {
+export const userDeActivate = async (
+	user_id: string | number
+): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const sql = "UPDATE users SET user_active = false WHERE user_id = $1";
@@ -116,7 +130,7 @@ export const userDeActivate = async (user_id: string): Promise<User> => {
 	}
 };
 
-// export const userRemove = async (user_id: string): Promise<User> => {
+// export const userRemove = async (user_id: string | number): Promise<User> => {
 // 	try {
 // 		const conn: PoolClient = await client.connect();
 // 		const sql = "DELETE FROM users WHERE user_id=($1)";
