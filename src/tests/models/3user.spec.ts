@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import {
 	userCreate,
 	userIndex,
@@ -7,16 +8,9 @@ import {
 } from "../../models/user";
 import { User } from "../../typings/interface";
 import { UserQuery } from "../../typings/types";
+import testData from "../helpers/testData";
 
 describe("User Model", () => {
-	const newUser = {
-		user_id: -1,
-		user_email: "email@c.com",
-		user_firstname: "Sh",
-		user_lastname: "A",
-		user_password: "password",
-		user_active: true
-	};
 	it("should have an index method", () => {
 		expect(userIndex).toBeDefined();
 	});
@@ -39,52 +33,43 @@ describe("User Model", () => {
 
 	it("create method should add a user", async () => {
 		const result = await userCreate({
-			user_email: newUser.user_email,
-			user_firstname: newUser.user_firstname,
-			user_lastname: newUser.user_lastname,
-			user_password: newUser.user_password
+			user_email: testData.dataBaseTestUser.user_email,
+			user_firstname: testData.dataBaseTestUser.user_firstname,
+			user_lastname: testData.dataBaseTestUser.user_lastname,
+			user_password: testData.dataBaseTestUser.user_password
 		} as unknown as Omit<User, "user_id">);
-		newUser.user_id = result.user_id as unknown as number;
-		newUser.user_password = result.user_password;
-
-		expect(result).toEqual(newUser);
+		testData.dataBaseTestUser.user_id = result.user_id as unknown as number;
+		expect(result).toEqual(
+			_.omit(testData.dataBaseTestUser, ["user_password"])
+		);
 	});
 
 	it("index method should return a list of active Users", async () => {
 		const result = await userIndex();
 		expect(result).toEqual([
-			{
-				user_id: newUser.user_id,
-				user_email: newUser.user_email,
-				user_firstname: newUser.user_firstname,
-				user_lastname: newUser.user_lastname
-			}
-		] as unknown as Omit<User, "user_password">[]);
-	});
-
-	it("show method should return the correct user", async () => {
-		const result = await userShow(newUser.user_id);
-		expect(result).toEqual(newUser);
+			_.omit(testData.dataBaseTestUser, ["user_password", "user_active"])
+		]);
 	});
 
 	it("show method should patch user", async () => {
 		const result = await userPatch({
-			user_id: 1,
+			user_id: testData.dataBaseTestUser.user_id,
 			user_password: "New password"
 		} as unknown as UserQuery);
-		newUser.user_password = result.user_password;
-		expect(result).toEqual(newUser);
+		expect(result).toEqual(
+			_.omit(testData.dataBaseTestUser, ["user_password"])
+		);
 	});
 
 	it("delete method should deactivate the user", async () => {
-		await userDeActivate("1");
-		newUser.user_active = false;
+		await userDeActivate(testData.dataBaseTestUser.user_id);
+		testData.dataBaseTestUser.user_active = false;
 		const result = await userIndex();
 		expect(result).toEqual([]);
 	});
 
 	it("show method should return the correct user with active = false", async () => {
-		const result = await userShow(newUser.user_id);
-		expect(result).toEqual(newUser);
+		const result = await userShow(testData.dataBaseTestUser.user_id);
+		expect(result.user_active).toBe(false);
 	});
 });

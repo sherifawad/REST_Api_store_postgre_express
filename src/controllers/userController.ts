@@ -7,6 +7,7 @@ import {
 	userDeActivate,
 	userShow
 } from "../models/user";
+import { loginService } from "../services/userServices";
 import { User } from "../typings/interface";
 
 export const userViewController = async (
@@ -41,7 +42,8 @@ export const usersViewController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const data: Omit<User, "user_password">[] = await userIndex();
+		const data: Omit<User, "user_password" | "user_active">[] =
+			await userIndex();
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -73,7 +75,7 @@ export const userAddController = async (
 			user_password,
 			user_active
 		} = req.body;
-		const data: User = await userCreate({
+		const data: Omit<User, "user_password"> = await userCreate({
 			user_firstname,
 			user_lastname,
 			user_email,
@@ -81,10 +83,13 @@ export const userAddController = async (
 			user_active
 		});
 		if (!data) throw new Error("there are no data");
+		const user = await userShow(data.user_id);
+		const token = loginService(user);
 		return res.status(201).json({
 			status: 201,
 			message: "Created Successfully",
-			data
+			data,
+			token
 		});
 	} catch (error) {
 		// check if instance of error not throw string but => throw new Error("")
@@ -117,10 +122,13 @@ export const userUpdateController = async (
 			user_password
 		});
 		if (!data) throw new Error("there are no data");
+		const user = await userShow(data.user_id);
+		const token = loginService(user);
 		return res.status(200).json({
 			status: 200,
 			message: "Updated Successfully",
-			data
+			data,
+			token
 		});
 	} catch (error) {
 		// check if instance of error not throw string but => throw new Error("")
