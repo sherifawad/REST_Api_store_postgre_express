@@ -3,57 +3,28 @@ import client from "../services/connection";
 import { Order, OrderProduct } from "../typings/interface";
 import { OrderQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
+import { checkProductExist } from "./product";
+import {
+	orderRemoveQuery,
+	orderShowQuery,
+	ordersIndexQuery,
+	showOrderDetailsQuery
+} from "./queries/ordersQueries";
+import { userShow } from "./user";
 
-export const orderIndex = async (): Promise<Order[]> => {
+export const orderIndex = async (): Promise<
+	Omit<Order, "order_products">[]
+> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
-		const productsSql = ` 
-                    SELECT op.*, p.*, c.*
-                    FROM orders_products As op 
-                    INNER JOIN products As p
-                    ON op.product_id = p.product_id
-                    INNER JOIN categories As c
-                    ON p.category_id = c.category_id;`;
-
-		const sql = `
-                    SELECT o.*, u.*
-                    FROM orders As o
-                    INNER JOIN users As u 
-                    ON o.user_id = u.user_id;`;
-
-		// const sql = `SELECT * FROM orders`;
-		const productsResult: QueryResult<OrderProduct> = await conn.query(
-			productsSql
-		);
-
-		const result = await conn.query(sql);
+		const result = await conn.query(ordersIndexQuery);
 		conn.release();
 
-		const data: Order[] = result.rows.map(row => ({
+		const data: Omit<Order, "order_products">[] = result.rows.map(row => ({
 			order_id: row.order_id,
 			order_date: (row.order_date as unknown as Date).toISOString(),
-			user_id: row.user_id,
-			user: {
-				user_id: row.user_id,
-				user_email: row.user_email,
-				user_firstname: row.user_firstname,
-				user_lastname: row.user_lastname,
-				user_active: row.user_active
-			},
-			order_products: productsResult.rows.map(productRow => ({
-				order_product_id: productRow.order_product_id,
-				order_id: productRow.order_id,
-				order_product_quantity: parseInt(
-					productRow.order_product_quantity as unknown as string,
-					10
-				),
-				product_id: productRow.product_id,
-				product_name: productRow.product_name,
-				product_description: productRow.product_description,
-				product_price: productRow.product_price,
-				user_id: row.user_id
-			}))
+			user_id: row.user_id
 		}));
 		return data;
 	} catch (err) {
@@ -83,17 +54,24 @@ export const orderCreate = async ({
 		}
 
 		(order_products as OrderProduct[]).forEach(async product => {
-			const OutOrderProduct = queryPrepare<OrderProduct>({
-				order_id,
-				product_id: product.product_id,
-				order_product_quantity: product.order_product_quantity
-			});
+			const productExist = await checkProductExist(product.product_id);
+			if (productExist) {
+				const OutOrderProduct = queryPrepare<OrderProduct>({
+					order_id,
+					product_id: product.product_id,
+					order_product_quantity: product.order_product_quantity
+				});
 
-			const SqlOrderProduct = createInsert(
-				"orders_products",
-				OutOrderProduct.keys
-			);
-			await conn.query(SqlOrderProduct, OutOrderProduct.values);
+				const SqlOrderProduct = createInsert(
+					"orders_products",
+					OutOrderProduct.keys
+				);
+				await conn.query(SqlOrderProduct, OutOrderProduct.values);
+			} else {
+				console.error(
+					`Product with Id: ${product.product_id} not found`
+				);
+			}
 		});
 
 		conn.release();
@@ -153,12 +131,24 @@ export const orderPatch = async ({
 						OutOrderProduct.keys
 					);
 				} else {
-					SqlOrderProduct = createInsert(
-						"orders_products",
-						OutOrderProduct.keys
+					const productExist = await checkProductExist(
+						product.product_id
 					);
+					if (productExist) {
+						SqlOrderProduct = createInsert(
+							"orders_products",
+							OutOrderProduct.keys
+						);
+						await conn.query(
+							SqlOrderProduct,
+							OutOrderProduct.values
+						);
+					} else {
+						console.error(
+							`Product with Id: ${product.product_id} not found`
+						);
+					}
 				}
-				await conn.query(SqlOrderProduct, OutOrderProduct.values);
 			});
 		}
 
@@ -181,79 +171,13 @@ export const orderPatch = async ({
 	}
 };
 
-export const orderShow = async (order_id: string | number): Promise<Order> => {
-	try {
-		const conn: PoolClient = await client.connect();
-
-		const productsSql = ` 
-                    SELECT op.*, p.*, c.*
-                    FROM orders_products As op 
-                    INNER JOIN products As p
-                    ON op.product_id = p.product_id
-                    INNER JOIN categories As c
-                    ON p.category_id = c.category_id 
-                    WHERE op.order_id=($1) 
-                    ORDER BY op.order_product_id;`;
-
-		const sql = `
-                    SELECT o.*, u.*
-                    FROM orders As o
-                    INNER JOIN users As u 
-                    ON o.user_id = u.user_id
-                    WHERE o.order_id=($1);`;
-
-		// const sql = `SELECT * FROM orders`;
-		const productsResult: QueryResult<OrderProduct> = await conn.query(
-			productsSql,
-			[order_id]
-		);
-
-		const result = await conn.query(sql, [order_id]);
-		conn.release();
-
-		const data: Order = result.rows.map(row => ({
-			order_id: row.order_id,
-			order_date: (row.order_date as unknown as Date).toISOString(),
-			user_id: row.user_id,
-			user: {
-				user_id: row.user_id,
-				user_email: row.user_email,
-				user_firstname: row.user_firstname,
-				user_lastname: row.user_lastname,
-				user_active: row.user_active
-			},
-			order_products: productsResult.rows.map(productRow => ({
-				order_product_id: productRow.order_product_id,
-				order_id: productRow.order_id,
-				order_product_quantity: parseInt(
-					productRow.order_product_quantity as unknown as string,
-					10
-				),
-				product_id: productRow.product_id,
-				product_name: productRow.product_name,
-				product_description: productRow.product_description,
-				product_price: productRow.product_price,
-				user_id: row.user_id
-			}))
-		}))[0];
-		return data;
-	} catch (err) {
-		throw new Error(`orders index : ${err}`);
-	}
-};
-
-export const orderOnlyShow = async (
-	order_id: string
+export const orderShow = async (
+	order_id: string | number
 ): Promise<Omit<Order, "order_products">> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
-		const sql = `
-                    SELECT *
-                    From orders
-                    WHERE order_id=($1);`;
-
-		const result = await conn.query(sql, [order_id]);
+		const result = await conn.query(orderShowQuery, [order_id]);
 		conn.release();
 		const data: Omit<Order, "order_products"> = result.rows.map(row => ({
 			order_id: row.order_id,
@@ -266,13 +190,56 @@ export const orderOnlyShow = async (
 	}
 };
 
+export const showOrderDetails = async (
+	order_id: string | number
+): Promise<Order> => {
+	try {
+		const order = await orderShow(order_id);
+		const user = await userShow(order.user_id);
+		const conn: PoolClient = await client.connect();
+
+		const result = await conn.query(showOrderDetailsQuery, [order_id]);
+
+		const data: Order = {
+			order_id: order.order_id,
+			order_date: order.order_date,
+			user_id: order.user_id,
+			user: {
+				user_id: user.user_id,
+				user_email: user.user_email,
+				user_firstname: user.user_firstname,
+				user_lastname: user.user_lastname,
+				user_active: user.user_active
+			},
+			order_products: result.rows.map(productRow => ({
+				order_product_id: productRow.order_product_id,
+				order_id: productRow.order_id,
+				order_product_quantity: parseInt(
+					productRow.order_product_quantity as unknown as string,
+					10
+				),
+				product_id: productRow.product_id,
+				product_name: productRow.product_name,
+				product_description: productRow.product_description,
+				product_price: productRow.product_price,
+				user_id: user.user_id
+			}))
+		};
+		return data;
+		conn.release();
+	} catch (error) {
+		throw new Error(`orders details : ${error}`);
+	}
+};
+
 export const orderRemove = async (
 	order_id: string | number
 ): Promise<Order> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "DELETE FROM orders WHERE order_id=($1)";
-		const result: QueryResult<Order> = await conn.query(sql, [order_id]);
+		const result: QueryResult<Order> = await conn.query(orderRemoveQuery, [
+			order_id
+		]);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {

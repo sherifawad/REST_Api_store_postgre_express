@@ -3,12 +3,19 @@ import client from "../services/connection";
 import { Product } from "../typings/interface";
 import { ProductQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
+import {
+	checkProductExistQuery,
+	productIndexQuery,
+	productRemoveQuery,
+	productShowQuery
+} from "./queries/productsQueries";
 
 export const productIndex = async (): Promise<Product[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT * FROM products`;
-		const result: QueryResult<Product> = await conn.query(sql);
+		const result: QueryResult<Product> = await conn.query(
+			productIndexQuery
+		);
 		conn.release();
 		return result.rows;
 	} catch (err) {
@@ -21,12 +28,7 @@ export const productShow = async (
 ): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT products.*, 
-        categories.* 
-        FROM products INNER JOIN categories 
-        ON products.category_id = categories.category_id 
-        WHERE products.product_id=($1);`;
-		const result = await conn.query(sql, [product_id]);
+		const result = await conn.query(productShowQuery, [product_id]);
 		conn.release();
 		return result.rows.map(row => ({
 			product_id: row.product_id,
@@ -54,9 +56,8 @@ export const checkProductExist = async (
 ): Promise<boolean> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT 1 FROM products WHERE product_id=($1) LIMIT 1;`;
 		// const sql = `SELECT product_id FROM products WHERE product_id=($1);`;
-		const result = await conn.query(sql, [product_id]);
+		const result = await conn.query(checkProductExistQuery, [product_id]);
 		conn.release();
 		if (result.rows[0]) return true;
 	} catch (err) {
@@ -127,10 +128,10 @@ export const productRemove = async (
 ): Promise<Product> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "DELETE FROM products WHERE product_id=($1)";
-		const result: QueryResult<Product> = await conn.query(sql, [
-			product_id
-		]);
+		const result: QueryResult<Product> = await conn.query(
+			productRemoveQuery,
+			[product_id]
+		);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {

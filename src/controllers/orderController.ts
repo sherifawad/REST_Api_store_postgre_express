@@ -16,7 +16,7 @@ export const orderViewController = async (
 	try {
 		const { order_id } = req.params;
 		if (!order_id) throw new Error("No order_id");
-		const data: Order = await orderShow(order_id);
+		const data: Omit<Order, "order_products"> = await orderShow(order_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -41,7 +41,7 @@ export const ordersViewController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const data: Order[] = await orderIndex();
+		const data: Omit<Order, "order_products">[] = await orderIndex();
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,

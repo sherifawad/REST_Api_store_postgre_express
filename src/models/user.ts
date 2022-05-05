@@ -4,16 +4,21 @@ import { hashPasswordService } from "../services/userServices";
 import { User } from "../typings/interface";
 import { UserQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
+import {
+	checkEmailExistQuery,
+	userDeActivateQuery,
+	userIndexQuery,
+	userRemoveQuery,
+	userShowQuery
+} from "./queries/usersQueries";
 
 export const userIndex = async (): Promise<
 	Omit<User, "user_password" | "user_active">[]
 > => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql =
-			"SELECT user_id, user_email, user_firstname, user_lastname FROM users WHERE user_active";
 		const result: QueryResult<Omit<User, "user_password">> =
-			await conn.query(sql);
+			await conn.query(userIndexQuery);
 		conn.release();
 		return result.rows;
 	} catch (err) {
@@ -24,9 +29,9 @@ export const userIndex = async (): Promise<
 export const userShow = async (user_id: string | number): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql =
-			"SELECT user_id, user_email, user_firstname, user_lastname, user_password, user_active FROM users WHERE user_id=($1)";
-		const result: QueryResult<User> = await conn.query(sql, [user_id]);
+		const result: QueryResult<User> = await conn.query(userShowQuery, [
+			user_id
+		]);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -72,8 +77,7 @@ export const checkEmailExists = async (
 ): Promise<boolean> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "SELECT 1 FROM users WHERE user_email=($1) LIMIT 1";
-		const result = await conn.query(sql, [user_email]);
+		const result = await conn.query(checkEmailExistQuery, [user_email]);
 		conn.release();
 		if (result.rows[0]) return true;
 	} catch (err) {
@@ -126,8 +130,10 @@ export const userDeActivate = async (
 ): Promise<User> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "UPDATE users SET user_active = false WHERE user_id = $1";
-		const result: QueryResult<User> = await conn.query(sql, [user_id]);
+		const result: QueryResult<User> = await conn.query(
+			userDeActivateQuery,
+			[user_id]
+		);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -138,8 +144,9 @@ export const userDeActivate = async (
 // export const userRemove = async (user_id: string | number): Promise<User> => {
 // 	try {
 // 		const conn: PoolClient = await client.connect();
-// 		const sql = "DELETE FROM users WHERE user_id=($1)";
-// 		const result: QueryResult<User> = await conn.query(sql, [user_id]);
+// 		const result: QueryResult<User> = await conn.query(userRemoveQuery, [
+// 			user_id
+// 		]);
 // 		conn.release();
 // 		return result.rows[0];
 // 	} catch (err) {

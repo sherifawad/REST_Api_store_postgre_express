@@ -41,6 +41,34 @@ const testData = {
 		product_description: "DELL",
 		product_price: "6000.00",
 		category_id: 2
+	},
+	dataBaseTestOrder: {
+		order_id: -1,
+		user_id: 1,
+		order_date: new Date().toISOString(),
+		order_products: [
+			{
+				order_product_id: -1,
+				order_id: -1,
+				user_id: 1,
+				order_product_quantity: 5,
+				product_id: 1
+			}
+		]
+	},
+	apiTestOrder: {
+		order_id: -1,
+		user_id: 2,
+		order_date: new Date().toISOString(),
+		order_products: [
+			{
+				order_product_id: -1,
+				order_id: -1,
+				user_id: 2,
+				order_product_quantity: 10,
+				product_id: 2
+			}
+		]
 	}
 };
 

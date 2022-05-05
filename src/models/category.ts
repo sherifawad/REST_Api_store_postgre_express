@@ -3,12 +3,20 @@ import client from "../services/connection";
 import { Category } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
+import {
+	categoryIndexQuery,
+	categoryProductsShowQuery,
+	categoryRemoveQuery,
+	categoryShowQuery,
+	checkCategoryExistQuery
+} from "./queries/categoryQueries";
 
 export const categoryIndex = async (): Promise<Category[]> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "SELECT * FROM categories";
-		const result: QueryResult<Category> = await conn.query(sql);
+		const result: QueryResult<Category> = await conn.query(
+			categoryIndexQuery
+		);
 		conn.release();
 		return result.rows;
 	} catch (err) {
@@ -21,10 +29,10 @@ export const categoryShow = async (
 ): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "SELECT * FROM categories WHERE category_id=($1)";
-		const result: QueryResult<Category> = await conn.query(sql, [
-			category_id
-		]);
+		const result: QueryResult<Category> = await conn.query(
+			categoryShowQuery,
+			[category_id]
+		);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
@@ -39,8 +47,7 @@ export const checkCategoryExist = async (
 ): Promise<boolean> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = `SELECT 1 FROM categories WHERE category_id=($1) LIMIT 1;`;
-		const result = await conn.query(sql, [category_id]);
+		const result = await conn.query(checkCategoryExistQuery, [category_id]);
 		conn.release();
 		if (result.rows[0]) return true;
 	} catch (err) {
@@ -55,14 +62,9 @@ export const categoryProductsShow = async (
 	try {
 		const conn: PoolClient = await client.connect();
 
-		const sql = `SELECT c.*, p.*
-		FROM categories AS c
-		INNER JOIN products As p
-		ON c.category_id=p.category_id
-		WHERE c.category_id=($1) 
-        ORDER BY p.product_id;`;
-
-		const result = await conn.query(sql, [category_id]);
+		const result = await conn.query(categoryProductsShowQuery, [
+			category_id
+		]);
 		conn.release();
 		return {
 			category_id: result.rows[0].category_id,
@@ -134,10 +136,10 @@ export const categoryRemove = async (
 ): Promise<Category> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		const sql = "DELETE FROM categories WHERE category_id=($1)";
-		const result: QueryResult<Category> = await conn.query(sql, [
-			category_id
-		]);
+		const result: QueryResult<Category> = await conn.query(
+			categoryRemoveQuery,
+			[category_id]
+		);
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
