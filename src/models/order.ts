@@ -1,6 +1,6 @@
 import { PoolClient, QueryResult } from "pg";
 import client from "../services/connection";
-import { Order, OrderProduct } from "../typings/interface";
+import { Order, OrderProduct, Product } from "../typings/interface";
 import { OrderQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 import { checkProductExist } from "./product";
@@ -18,7 +18,7 @@ export const orderIndex = async (): Promise<
 	try {
 		const conn: PoolClient = await client.connect();
 
-		const result = await conn.query(ordersIndexQuery);
+		const result: QueryResult<Order> = await conn.query(ordersIndexQuery);
 		conn.release();
 
 		const data: Omit<Order, "order_products">[] = result.rows.map(row => ({
@@ -67,10 +67,6 @@ export const orderCreate = async ({
 					OutOrderProduct.keys
 				);
 				await conn.query(SqlOrderProduct, OutOrderProduct.values);
-			} else {
-				console.error(
-					`Product with Id: ${product.product_id} not found`
-				);
 			}
 		});
 
@@ -143,10 +139,6 @@ export const orderPatch = async ({
 							SqlOrderProduct,
 							OutOrderProduct.values
 						);
-					} else {
-						console.error(
-							`Product with Id: ${product.product_id} not found`
-						);
 					}
 				}
 			});
@@ -194,11 +186,28 @@ export const showOrderDetails = async (
 	order_id: string | number
 ): Promise<Order> => {
 	try {
+		console.log("🚀 ~ file: order.ts ~ line 188 ~ order_id", order_id);
 		const order = await orderShow(order_id);
 		const user = await userShow(order.user_id);
+
 		const conn: PoolClient = await client.connect();
 
 		const result = await conn.query(showOrderDetailsQuery, [order_id]);
+		conn.release();
+		console.log(
+			"🚀 ~ file: order.ts ~ line 196 ~ result command",
+			result.command
+		);
+		console.log("🚀 ~ file: order.ts ~ line 196 ~ result oid", result.oid);
+
+		console.log(
+			"🚀 ~ file: order.ts ~ line 196 ~ result rows",
+			result.rows
+		);
+		console.log(
+			"🚀 ~ file: order.ts ~ line 196 ~ result rows[0]",
+			result.rows[0]
+		);
 
 		const data: Order = {
 			order_id: order.order_id,
@@ -227,7 +236,6 @@ export const showOrderDetails = async (
 			}))
 		};
 		return data;
-		conn.release();
 	} catch (error) {
 		throw new Error(`orders details : ${error}`);
 	}

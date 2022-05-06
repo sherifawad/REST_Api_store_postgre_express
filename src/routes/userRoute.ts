@@ -6,6 +6,7 @@ import {
 	userUpdateController,
 	userViewController
 } from "../controllers/userController";
+import authenticationMiddleware from "../middlewares/authenticaionMiddleware";
 import validatorMiddleWare from "../middlewares/validatorMiddleWare";
 import { UserValidator } from "../validator/UserValidator";
 
@@ -16,6 +17,7 @@ userRouter.get("/", usersViewController);
 
 userRouter.get(
 	"/:user_id",
+	authenticationMiddleware,
 	UserValidator.checkUserEdit,
 	validatorMiddleWare,
 	userViewController
@@ -30,6 +32,7 @@ userRouter.post(
 
 userRouter.put(
 	"/:user_id",
+	authenticationMiddleware,
 	UserValidator.checkUserEdit,
 	validatorMiddleWare,
 	userUpdateController
@@ -37,6 +40,7 @@ userRouter.put(
 
 userRouter.delete(
 	"/:user_id",
+	authenticationMiddleware,
 	UserValidator.checkUserEdit,
 	validatorMiddleWare,
 	userDeleteController

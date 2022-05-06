@@ -14,6 +14,6 @@ routes.get("/", (_req: Request, res: Response): void => {
 routes.use("/category", authenticationMiddleware, categoryRouter);
 routes.use("/product", authenticationMiddleware, productRouter);
 routes.use("/user", userRouter);
-routes.use("/order", orderRouter);
+routes.use("/order", authenticationMiddleware, orderRouter);
 
 export default routes;

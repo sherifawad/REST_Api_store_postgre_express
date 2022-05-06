@@ -30,6 +30,7 @@ describe("Users Endpoint /api/user", () => {
 
 	it(" GET /api/user/:user_id should return correct user", done => {
 		req.get(`/api/user/${testData.apiTestUser.user_id}`)
+			.set("X-ACCESS-TOKEN", testData.apiTestUserToken)
 			.expect(200)
 			.then(async response => {
 				expect(response.body.data).toBeTruthy();
@@ -42,6 +43,7 @@ describe("Users Endpoint /api/user", () => {
 
 	it(" GET /api/user should return list of users", done => {
 		req.get("/api/user")
+			.set("X-ACCESS-TOKEN", testData.apiTestUserToken)
 			.expect(200)
 			.then(async response => {
 				expect(response.body.data).toEqual(jasmine.any(Array));
@@ -53,6 +55,7 @@ describe("Users Endpoint /api/user", () => {
 
 	it(" Delete /api/user should deactivate the user", done => {
 		req.delete(`/api/user/${testData.apiTestUser.user_id}`)
+			.set("X-ACCESS-TOKEN", testData.apiTestUserToken)
 			.expect(200)
 			.then(async () => {
 				expect(await userIndex()).toEqual([]);
