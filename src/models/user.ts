@@ -8,7 +8,6 @@ import {
 	checkEmailExistQuery,
 	userDeActivateQuery,
 	userIndexQuery,
-	userRemoveQuery,
 	userShowQuery
 } from "./queries/usersQueries";
 

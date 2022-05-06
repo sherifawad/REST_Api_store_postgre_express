@@ -45,10 +45,20 @@ describe("Order Model", () => {
 	});
 
 	it("show order method should return the correct order", async () => {
+		// const result = await showOrderDetails(
+		// 	testData.dataBaseTestOrder.order_id
+		// );
+
 		const result = await orderShow(testData.dataBaseTestOrder.order_id);
-		expect(result).toEqual(
-			_.omit(testData.dataBaseTestOrder, ["order_products"])
+		console.log(
+			"🚀 ~ file: 4order.spec.ts ~ line 53 ~ it ~ result",
+			result
 		);
+
+		expect(result).toEqual({
+			...testData.dataBaseTestOrder,
+			user: testData.dataBaseTestUser
+		});
 	});
 
 	it("index method should return a list of orders", async () => {
@@ -72,14 +82,12 @@ describe("Order Model", () => {
 			order_products: testData.dataBaseTestOrder.order_products
 		} as unknown as OrderQuery);
 		expect(result).toEqual(undefined);
-		// const data = await orderShow(testData.dataBaseTestOrder.order_id);
-		// console.log("🚀 ~ file: 4order.spec.ts ~ line 117 ~ it ~ data", data);
 	});
 
-	it("delete method should remove the order", async () => {
-		await orderRemove(testData.dataBaseTestOrder.order_id);
-		const result = await orderIndex();
+	// it("delete method should remove the order", async () => {
+	// 	await orderRemove(testData.dataBaseTestOrder.order_id);
+	// 	const result = await orderIndex();
 
-		expect(result).toEqual([]);
-	});
+	// 	expect(result).toEqual([]);
+	// });
 });

@@ -5,7 +5,6 @@ import {
 	orderIndex,
 	orderPatch,
 	orderRemove,
-	orderShow,
 	showOrderDetails
 } from "../models/order";
 import { Order } from "../typings/interface";
@@ -17,7 +16,7 @@ export const orderViewController = async (
 	try {
 		const { order_id } = req.params;
 		if (!order_id) throw new Error("No order_id");
-		const data: Omit<Order, "order_products"> = await orderShow(order_id);
+		const data: Order | undefined = await showOrderDetails(order_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,

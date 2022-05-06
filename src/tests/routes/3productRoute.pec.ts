@@ -52,15 +52,15 @@ describe("Products Endpoint /api/product", () => {
 			});
 	});
 
-	it(" Delete /api/product should delete the product", done => {
-		req.delete(`/api/product/${testData.apiTestProduct.product_id}`)
-			.set("Authorization", `Bearer ${testData.apiTestUserToken}`)
-			.expect(200)
-			.then(async () => {
-				expect((await productIndex())[0]).toEqual(
-					testData.dataBaseTestProduct
-				);
-				done();
-			});
-	});
+	// it(" Delete /api/product should delete the product", done => {
+	// 	req.delete(`/api/product/${testData.apiTestProduct.product_id}`)
+	// 		.set("Authorization", `Bearer ${testData.apiTestUserToken}`)
+	// 		.expect(200)
+	// 		.then(async () => {
+	// 			expect((await productIndex())[0]).toEqual(
+	// 				testData.dataBaseTestProduct
+	// 			);
+	// 			done();
+	// 		});
+	// });
 });
