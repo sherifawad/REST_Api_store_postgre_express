@@ -1,12 +1,22 @@
-export const objectOmit = <T>(object: T, keys: string[]) => {
-	const condition: string[] = [];
-	keys.forEach(key => {
-		condition.push(`k !== ${key}`);
-	});
-	console.log("🚀 ~ file: arrayUtils.ts ~ line 3 ~ condition", condition);
+/* eslint-disable no-await-in-loop */
+// https://advancedweb.hu/how-to-use-async-functions-with-array-some-and-every-in-javascript/
 
-	return Object.fromEntries(
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		Object.entries(object).filter(([k]) => condition.join(" && "))
-	);
+export const asyncSome = async <T>(
+	arr: T[],
+	predicate: (arg0: T) => unknown
+) => {
+	for (const e of arr) {
+		if (await predicate(e)) return true;
+	}
+	return false;
+};
+
+export const asyncEvery = async <T>(
+	arr: T[],
+	predicate: (arg0: T) => unknown
+) => {
+	for (const e of arr) {
+		if (!(await predicate(e))) return false;
+	}
+	return true;
 };

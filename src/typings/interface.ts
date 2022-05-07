@@ -25,7 +25,6 @@ export interface Product {
 }
 
 export interface OrderProduct {
-	order_product_id: string | number;
 	order_product_quantity: number;
 	product_id: string | number;
 	product?: Product;

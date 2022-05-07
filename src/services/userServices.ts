@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../typings/interface";
 
-export const loginService = (user: User): undefined | string => {
+export const loginService = (
+	user: Omit<User, "user_password">
+): undefined | string => {
 	if (!user) return undefined;
 	return jwt.sign(user, process.env.ACCESS_TOKEN || "token", {
 		expiresIn: process.env.JWT_EXPIRATION || "24h"

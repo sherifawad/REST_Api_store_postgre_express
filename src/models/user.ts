@@ -25,14 +25,23 @@ export const userIndex = async (): Promise<
 	}
 };
 
-export const userShow = async (user_id: string | number): Promise<User> => {
+export const userShow = async (
+	user_id: string | number
+): Promise<Omit<User, "user_password">> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<User> = await conn.query(userShowQuery, [
 			user_id
 		]);
 		conn.release();
-		return result.rows[0];
+		const data: Omit<User, "user_password"> = result.rows.map(row => ({
+			user_id: row.user_id,
+			user_email: row.user_email,
+			user_active: row.user_active,
+			user_firstname: row.user_firstname,
+			user_lastname: row.user_lastname
+		}))[0];
+		return data;
 	} catch (err) {
 		throw new Error(`user with id: ${user_id} does not exist: ${err}`);
 	}
@@ -106,8 +115,10 @@ export const userPatch = async ({
 				: user_password,
 			user_active
 		});
-		const sql = createPatch("user_id", "users", `${user_id}`, out.keys);
-
+		const sql = createPatch(["user_id"], "users", [`${user_id}`], out.keys);
+		if (sql === undefined) {
+			throw new Error("not patched empty sql query");
+		}
 		const result: QueryResult<User> = await conn.query(sql, out.values);
 
 		conn.release();

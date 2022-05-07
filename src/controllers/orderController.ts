@@ -67,7 +67,7 @@ export const orderAddController = async (
 ): Promise<Response> => {
 	try {
 		const { user_id, order_date, order_products } = req.body;
-		const data: Omit<Order, "order_products"> = await orderCreate({
+		const data: Order | undefined = await orderCreate({
 			user_id,
 			order_date,
 			order_products

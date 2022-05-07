@@ -19,11 +19,12 @@ describe("Orders Endpoint /api/order", () => {
 				expect(response.body.data.order_id).toBeTruthy();
 				testData.apiTestOrder.order_id = response.body.data.order_id;
 				expect(response.body.data).toEqual(
-					await orderShow(`${testData.apiTestOrder.order_id}`)
+					await showOrderDetails(`${testData.apiTestOrder.order_id}`)
 				);
 				done();
 			});
 	});
+
 	it(" GET /api/order/:order_id should return correct order", done => {
 		req.get(`/api/order/${testData.apiTestOrder.order_id}`)
 			.set("Authorization", `token ${testData.apiTestUserToken}`)
@@ -48,15 +49,15 @@ describe("Orders Endpoint /api/order", () => {
 				done();
 			});
 	});
-	// it(" Delete /api/order should delete the order", done => {
-	// 	req.delete(`/api/order/${testData.apiTestOrder.order_id}`)
-	// 		.set("Authorization", `token ${testData.apiTestUserToken}`)
-	// 		.expect(200)
-	// 		.then(async () => {
-	// 			expect(
-	// 				await orderShow(`${testData.apiTestOrder.order_id}`)
-	// 			).toEqual(undefined);
-	// 			done();
-	// 		});
-	// });
+	it(" Delete /api/order should delete the order", done => {
+		req.delete(`/api/order/${testData.apiTestOrder.order_id}`)
+			.set("Authorization", `token ${testData.apiTestUserToken}`)
+			.expect(200)
+			.then(async () => {
+				expect(
+					await orderShow(`${testData.apiTestOrder.order_id}`)
+				).toEqual(undefined);
+				done();
+			});
+	});
 });

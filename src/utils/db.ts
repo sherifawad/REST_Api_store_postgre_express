@@ -61,11 +61,14 @@ export const createInsertString = <T>(
 };
 
 export const createPatch = (
-	idColumnName: string,
+	idColumnNames: string[],
 	tableName: string,
-	id: string,
+	ids: string[],
 	keys: string[]
-): string => {
+): string | undefined => {
+	if (idColumnNames.length !== ids.length) {
+		return undefined;
+	}
 	// Setup static beginning of query
 	const query = [`UPDATE ${tableName}`];
 	query.push("SET");
@@ -79,9 +82,17 @@ export const createPatch = (
 	query.push(set.join(", "));
 
 	// Add the WHERE statement to look up by id
-	query.push(`WHERE ${idColumnName} = ${id}`);
+	// query.push(`WHERE ${idColumnName} = ${id}`);
+
+	query.push("WHERE");
+	idColumnNames.forEach((name, i) => {
+		query.push(`${name} = ${ids[i]}`);
+		if (i !== idColumnNames.length - 1) {
+			query.push(" AND ");
+		}
+	});
 	// return patched data
-	query.push(" RETURNING *");
+	query.push("RETURNING *");
 
 	// Return a complete query string
 	return query.join(" ");

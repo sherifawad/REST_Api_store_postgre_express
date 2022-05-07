@@ -17,7 +17,7 @@ export const userViewController = async (
 	try {
 		const { user_id } = req.params;
 		if (!user_id) throw new Error("No user_id");
-		const data: User = await userShow(user_id);
+		const data: Omit<User, "user_password"> = await userShow(user_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,

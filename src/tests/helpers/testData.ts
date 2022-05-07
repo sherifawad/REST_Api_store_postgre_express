@@ -48,9 +48,6 @@ const testData = {
 		order_date: new Date().toISOString(),
 		order_products: [
 			{
-				order_product_id: -1,
-				order_id: -1,
-				user_id: 1,
 				order_product_quantity: 50,
 				product_id: 1
 			}
@@ -62,9 +59,6 @@ const testData = {
 		order_date: new Date().toISOString(),
 		order_products: [
 			{
-				order_product_id: -1,
-				order_id: -1,
-				user_id: 2,
 				order_product_quantity: 10,
 				product_id: 2
 			}

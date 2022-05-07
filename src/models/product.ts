@@ -109,12 +109,14 @@ export const productPatch = async ({
 			category_id
 		});
 		const sql = createPatch(
-			"product_id",
+			["product_id"],
 			"products",
-			`${product_id}`,
+			[`${product_id}`],
 			out.keys
 		);
-
+		if (sql === undefined) {
+			throw new Error("not patched empty sql query");
+		}
 		const result = await conn.query(sql, out.values);
 		conn.release();
 		return result.rows[0];
