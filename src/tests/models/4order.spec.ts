@@ -9,7 +9,6 @@ import {
 } from "../../models/order";
 import { Order, OrderProduct } from "../../typings/interface";
 import { OrderQuery } from "../../typings/types";
-import { sleep } from "../../utils/utils";
 import testData from "../helpers/testData";
 
 describe("Order Model", () => {
