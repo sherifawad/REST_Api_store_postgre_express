@@ -12,7 +12,7 @@
 		"lint-fix": "eslint . --ext .ts --fix",
 		"jasmine": "ENV=test jasmine-ts --config=jasmine.json",
 		"test-db-create": " npm run test-db-down && db-migrate db:create test_db --config ./database_create.json",
-		"dev-db-create": " db-migrate db:create my_db --config ./database_create.json -e dev",
+		"dev_create": " db-migrate db:create my_db --config ./database_create.json -e dev",
 		"test-db-up": "db-migrate up --config ./database_migration.json",
 		"dev-db-up": "cross-env ENV=dev db-migrate up -e dev --config ./database_migration.json",
 		"test-db-down": "db-migrate --config ./database_create.json db:drop test_db",

@@ -1,23 +1,25 @@
 # REST Api Project
 
-Use docker for node and postgres data base with jasmine test
+Node and postgres data base with jasmine test
+
+## Test
+
+```sh
+npm run test
+```
 
 ## Development
 
-postgres container:
+create database if not created
 
 ```sh
-docker exec -it db_server sh
+npm run dev_create
 ```
 
-```sh
-psql -h localhost -d my_db -U admin
-```
+Run project:
 
 ```sh
- \dt
+npm run dev
 ```
 
-```sh
- \q
-```
+You can use postman by importing json file in postman folder into postman.
