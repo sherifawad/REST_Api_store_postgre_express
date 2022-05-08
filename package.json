@@ -10,12 +10,14 @@
 		"prettier-format": "prettier --config .prettierrc src/**/*.ts --write",
 		"lint": "eslint . --ext .ts --quiet",
 		"lint-fix": "eslint . --ext .ts --fix",
-		"migrate-test": "cross-env ENV=test db-migrate up",
 		"jasmine": "ENV=test jasmine-ts --config=jasmine.json",
 		"test-db-create": " npm run test-db-down && db-migrate db:create test_db --config ./database_create.json",
+		"dev-db-create": " db-migrate db:create my_db --config ./database_create.json -e dev",
 		"test-db-up": "db-migrate up --config ./database_migration.json",
+		"dev-db-up": "cross-env ENV=dev db-migrate up -e dev --config ./database_migration.json",
 		"test-db-down": "db-migrate --config ./database_create.json db:drop test_db",
-		"test": "npm run test-db-create && npm run test-db-up && npm run jasmine && npm run test-db-down"
+		"test": "npm run test-db-create && npm run test-db-up && npm run jasmine && npm run test-db-down",
+		"dev": "npm run dev-db-up && npm run watch"
 	},
 	"keywords": [],
 	"author": "",
@@ -27,7 +29,6 @@
 		"express": "^4.17.3",
 		"express-validator": "^6.14.0",
 		"jsonwebtoken": "^8.5.1",
-		"lodash": "^4.17.21",
 		"pg": "^8.7.3"
 	},
 	"devDependencies": {
@@ -58,6 +59,7 @@
 		"supertest": "^6.2.3",
 		"ts-node": "^10.7.0",
 		"tsc-watch": "^5.0.3",
+		"lodash": "^4.17.21",
 		"typescript": "^4.6.3"
 	}
 }

@@ -9,6 +9,7 @@ import {
 } from "../../models/order";
 import { Order, OrderProduct } from "../../typings/interface";
 import { OrderQuery } from "../../typings/types";
+import { sleep } from "../../utils/utils";
 import testData from "../helpers/testData";
 
 describe("Order Model", () => {
@@ -68,9 +69,8 @@ describe("Order Model", () => {
 			order_id: testData.dataBaseTestOrder.order_id,
 			order_products: testData.dataBaseTestOrder.order_products
 		} as unknown as OrderQuery);
-		expect(result).toEqual(
-			await showOrderDetails(testData.dataBaseTestOrder.order_id)
-		);
+		const output = await orderShow(testData.dataBaseTestOrder.order_id);
+		expect(result).toEqual(output);
 		done();
 	});
 

@@ -13,7 +13,7 @@ import { UserValidator } from "../validator/UserValidator";
 // create Router() instance
 const userRouter = Express.Router();
 
-userRouter.get("/", usersViewController);
+userRouter.get("/", authenticationMiddleware, usersViewController);
 
 userRouter.get(
 	"/:user_id",

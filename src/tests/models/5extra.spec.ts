@@ -3,7 +3,7 @@ import { categoryProductsShow } from "../../models/category";
 import testData from "../helpers/testData";
 
 describe("Extra", () => {
-	it("Category products method should return a list of products with specified category Id", async () => {
+	it("Category products method should return a list of products with specified category Id", async done => {
 		const result = await categoryProductsShow(
 			testData.dataBaseTestCategory.category_id
 		);
@@ -16,5 +16,6 @@ describe("Extra", () => {
 				_.omit(testData.dataBaseTestProduct, ["category_id"])
 			]
 		});
+		done();
 	});
 });

@@ -188,7 +188,7 @@ export const orderPatch = async ({
 				});
 			});
 		}
-		const data = await showOrderDetails(order_id);
+		const data = await orderShow(order_id);
 		return data;
 	} catch (err) {
 		throw new Error(`Order not created: ${err}`);

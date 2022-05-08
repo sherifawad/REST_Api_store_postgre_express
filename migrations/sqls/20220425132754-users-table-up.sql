@@ -1,4 +1,4 @@
-Create Table users (
+Create Table IF NOT EXISTS  users (
     user_id Serial Primary key,
     user_email  VarChar(100)  Not Null Unique,
     user_active  boolean not null default(true),

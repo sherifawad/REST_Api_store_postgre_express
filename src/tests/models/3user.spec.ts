@@ -31,7 +31,7 @@ describe("User Model", () => {
 		expect(userDeActivate).toBeDefined();
 	});
 
-	it("create method should add a user", async () => {
+	it("create method should add a user", async done => {
 		const result = await userCreate({
 			user_email: testData.dataBaseTestUser.user_email,
 			user_firstname: testData.dataBaseTestUser.user_firstname,
@@ -42,16 +42,18 @@ describe("User Model", () => {
 		expect(result).toEqual(
 			_.omit(testData.dataBaseTestUser, ["user_password"])
 		);
+		done();
 	});
 
-	it("index method should return a list of active Users", async () => {
+	it("index method should return a list of active Users", async done => {
 		const result = await userIndex();
 		expect(result).toEqual([
 			_.omit(testData.dataBaseTestUser, ["user_password", "user_active"])
 		]);
+		done();
 	});
 
-	it("show method should patch user", async () => {
+	it("show method should patch user", async done => {
 		const result = await userPatch({
 			user_id: testData.dataBaseTestUser.user_id,
 			user_password: "New password"
@@ -59,17 +61,20 @@ describe("User Model", () => {
 		expect(result).toEqual(
 			_.omit(testData.dataBaseTestUser, ["user_password"])
 		);
+		done();
 	});
 
-	it("delete method should deactivate the user", async () => {
+	it("delete method should deactivate the user", async done => {
 		await userDeActivate(testData.dataBaseTestUser.user_id);
 		testData.dataBaseTestUser.user_active = false;
 		const result = await userIndex();
 		expect(result).toEqual([]);
+		done();
 	});
 
-	it("show method should return the correct user with active = false", async () => {
+	it("show method should return the correct user with active = false", async done => {
 		const result = await userShow(testData.dataBaseTestUser.user_id);
 		expect(result.user_active).toBe(false);
+		done();
 	});
 });
