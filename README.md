@@ -17,11 +17,21 @@ test database name "test_db", developing database name "my_db"
 npm install -g db-migrate
 ```
 
+## Docker
+
+```sh
+docker-compose up
+```
+
+create database manually with name "my_db" or ```sh npm run dev_create
+
+````
+
 ## Test
 
 ```sh
 npm run test
-```
+````
 
 command create database then run migrations and run jasmine test and finally
 drop migration and database
