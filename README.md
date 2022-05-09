@@ -31,14 +31,6 @@ drop migration and database
 
 ## Development
 
-create database if not created
-
-```sh
-npm run dev_create
-```
-
-Run project:
-
 ```sh
 npm run dev
 ```
