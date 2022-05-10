@@ -1,6 +1,7 @@
 import { body, param } from "express-validator";
 import { checkProductExist } from "../models/product";
 import { OrderProduct } from "../typings/interface";
+import { asyncSome } from "../utils/arrayUtils";
 
 export const orderCreateValidator = [
 	body("user_id")
@@ -16,13 +17,18 @@ export const orderCreateValidator = [
 		.isArray({ min: 1 })
 		.withMessage(`at least 1 item required`)
 		.bail()
-		.custom((value: OrderProduct[]): boolean =>
-			value.every(
-				async v =>
-					v.order_product_quantity &&
-					v.product_id &&
-					(await checkProductExist(v.product_id))
-			)
+		.custom(
+			async (value: OrderProduct[]): Promise<boolean> =>
+				asyncSome(value, async (product: OrderProduct) => {
+					if (
+						product.order_product_quantity &&
+						product.product_id &&
+						(await checkProductExist(product.product_id))
+					) {
+						return true;
+					}
+					return false;
+				})
 		)
 		.withMessage("Not valid Products")
 ];

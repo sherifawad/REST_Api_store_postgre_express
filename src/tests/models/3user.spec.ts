@@ -6,11 +6,18 @@ import {
 	userDeActivate,
 	userShow
 } from "../../models/user";
+import client from "../../services/connection";
 import { User } from "../../typings/interface";
 import { UserQuery } from "../../typings/types";
 import testData from "../helpers/testData";
 
 describe("User Model", () => {
+	afterAll(() => {
+		console.log(
+			`function: User Model afterAll, total: ${client.totalCount}, idle: ${client.idleCount}, waiting: ${client.waitingCount}`
+		);
+		console.log("=========================================");
+	});
 	it("should have an index method", () => {
 		expect(userIndex).toBeDefined();
 	});
@@ -31,7 +38,7 @@ describe("User Model", () => {
 		expect(userDeActivate).toBeDefined();
 	});
 
-	it("create method should add a user", async done => {
+	it("create method should add a user", async () => {
 		const result = await userCreate({
 			user_email: testData.dataBaseTestUser.user_email,
 			user_firstname: testData.dataBaseTestUser.user_firstname,
@@ -42,18 +49,16 @@ describe("User Model", () => {
 		expect(result).toEqual(
 			_.omit(testData.dataBaseTestUser, ["user_password"])
 		);
-		done();
 	});
 
-	it("index method should return a list of active Users", async done => {
+	it("index method should return a list of active Users", async () => {
 		const result = await userIndex();
 		expect(result).toEqual([
 			_.omit(testData.dataBaseTestUser, ["user_password", "user_active"])
 		]);
-		done();
 	});
 
-	it("show method should patch user", async done => {
+	it("show method should patch user", async () => {
 		const result = await userPatch({
 			user_id: testData.dataBaseTestUser.user_id,
 			user_password: "New password"
@@ -61,20 +66,17 @@ describe("User Model", () => {
 		expect(result).toEqual(
 			_.omit(testData.dataBaseTestUser, ["user_password"])
 		);
-		done();
 	});
 
-	it("delete method should deactivate the user", async done => {
+	it("delete method should deactivate the user", async () => {
 		await userDeActivate(testData.dataBaseTestUser.user_id);
 		testData.dataBaseTestUser.user_active = false;
 		const result = await userIndex();
 		expect(result).toEqual([]);
-		done();
 	});
 
-	it("show method should return the correct user with active = false", async done => {
+	it("show method should return the correct user with active = false", async () => {
 		const result = await userShow(testData.dataBaseTestUser.user_id);
 		expect(result.user_active).toBe(false);
-		done();
 	});
 });

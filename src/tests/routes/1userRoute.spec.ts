@@ -2,9 +2,16 @@ import * as _ from "lodash";
 import supertest from "supertest";
 import { userIndex, userShow } from "../../models/user";
 import { app } from "../../server";
+import client from "../../services/connection";
 import testData from "../helpers/testData";
 
 describe("Users Endpoint /api/user", () => {
+	afterAll(() => {
+		console.log(
+			`function: User Router afterAll, total: ${client.totalCount}, idle: ${client.idleCount}, waiting: ${client.waitingCount}`
+		);
+		console.log("=========================================");
+	});
 	const req = supertest(app);
 
 	it("POST should create new user POST /api/user", done => {

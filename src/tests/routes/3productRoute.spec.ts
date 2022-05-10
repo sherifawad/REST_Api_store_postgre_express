@@ -1,9 +1,16 @@
 import supertest from "supertest";
 import { productIndex, productShow } from "../../models/product";
 import { app } from "../../server";
+import client from "../../services/connection";
 import testData from "../helpers/testData";
 
 describe("Products Endpoint /api/product", () => {
+	afterAll(() => {
+		console.log(
+			`function: Product Router afterAll, total: ${client.totalCount}, idle: ${client.idleCount}, waiting: ${client.waitingCount}`
+		);
+		console.log("=========================================");
+	});
 	const req = supertest(app);
 
 	it("POST should create new product POST /api/product", done => {

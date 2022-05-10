@@ -1,5 +1,5 @@
 import { PoolClient, QueryResult } from "pg";
-import client from "../services/connection";
+import client, { handleError } from "../services/connection";
 import { OrderProduct } from "../typings/interface";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
 import { checkProductExist } from "./product";
@@ -14,7 +14,7 @@ import { orderProductsQuery } from "./queries/ordersQueries";
 export const orderProductShow = async (
 	order_id: string | number,
 	product_id: string | number
-): Promise<OrderProduct> => {
+): Promise<OrderProduct | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<OrderProduct> = await conn.query(
@@ -24,15 +24,17 @@ export const orderProductShow = async (
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`order_product with id: ${order_id}${product_id} does not exist: ${err}`
+		handleError(
+			new Error(
+				`order_product with id: ${order_id}${product_id} does not exist: ${err}`
+			)
 		);
 	}
 };
 
 export const orderProductsIndex = async (
 	order_id: string | number
-): Promise<OrderProduct[]> => {
+): Promise<OrderProduct[] | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<OrderProduct> = await conn.query(
@@ -46,13 +48,15 @@ export const orderProductsIndex = async (
 		}));
 		return data;
 	} catch (err) {
-		throw new Error(`No products with order id: ${order_id}: ${err}`);
+		handleError(
+			new Error(`No products with order id: ${order_id}: ${err}`)
+		);
 	}
 };
 
-export const orderAllProducts = async (
+export const orderProductsDetails = async (
 	order_id: string | number
-): Promise<Omit<OrderProduct, "product_id">[]> => {
+): Promise<Omit<OrderProduct, "product_id">[] | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -74,7 +78,30 @@ export const orderAllProducts = async (
 			}
 		}));
 	} catch (err) {
-		throw new Error(`No products with order id: ${order_id}: ${err}`);
+		handleError(
+			new Error(`No products with order id: ${order_id}: ${err}`)
+		);
+	}
+};
+
+export const orderProducts = async (
+	order_id: string | number
+): Promise<OrderProduct[] | void> => {
+	try {
+		const conn: PoolClient = await client.connect();
+
+		const result = await conn.query(orderProductsQuery, [order_id]);
+		conn.release();
+
+		return result.rows.map(productRow => ({
+			order_product_quantity: productRow.order_product_quantity,
+			product_id: productRow.product_id,
+			order_id: productRow.order_id
+		}));
+	} catch (err) {
+		handleError(
+			new Error(`No products with order id: ${order_id}: ${err}`)
+		);
 	}
 };
 
@@ -82,13 +109,12 @@ export const orderProductCreate = async ({
 	order_id,
 	order_product_quantity,
 	product_id
-}: Omit<OrderProduct, "order_product_id">): Promise<OrderProduct> => {
+}: Omit<OrderProduct, "order_product_id">): Promise<OrderProduct | void> => {
 	try {
 		const productExist = await checkProductExist(product_id);
 		if (!productExist) {
 			throw new Error(`product with id: ${product_id} not exist`);
 		}
-		const conn = await client.connect();
 
 		const OutOrderProduct = queryPrepare<OrderProduct>({
 			order_id,
@@ -100,14 +126,16 @@ export const orderProductCreate = async ({
 			"orders_products",
 			OutOrderProduct.keys
 		);
+		const conn = await client.connect();
 		const result = await conn.query(
 			SqlOrderProduct,
 			OutOrderProduct.values
 		);
 		conn.release();
+
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`order_product not created: ${err}`);
+		handleError(new Error(`order_product not created: ${err}`));
 	}
 };
 
@@ -115,7 +143,7 @@ export const orderProductPatch = async ({
 	order_id,
 	order_product_quantity,
 	product_id
-}: OrderProduct): Promise<OrderProduct> => {
+}: OrderProduct): Promise<OrderProduct | void> => {
 	try {
 		const productExist = await checkProductExist(product_id);
 		if (!productExist) {
@@ -133,7 +161,6 @@ export const orderProductPatch = async ({
 			[`${order_id}`, `${product_id}`],
 			out.keys
 		);
-		console.log("🚀 ~ file: orderPRoducts.ts ~ line 137 ~ sql", sql);
 		if (sql === undefined) {
 			throw new Error("not patched empty sql query");
 		}
@@ -141,8 +168,10 @@ export const orderProductPatch = async ({
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`order_product with id: ${order_id}${product_id} not patched: ${err}`
+		handleError(
+			new Error(
+				`order_product with id: ${order_id}${product_id} not patched: ${err}`
+			)
 		);
 	}
 };
@@ -150,7 +179,7 @@ export const orderProductPatch = async ({
 export const orderProductRemove = async (
 	order_id: string | number,
 	product_id: string | number
-): Promise<OrderProduct> => {
+): Promise<OrderProduct | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<OrderProduct> = await conn.query(
@@ -160,15 +189,17 @@ export const orderProductRemove = async (
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`order_product with id: ${order_id}${product_id} can not be removed: ${err}`
+		handleError(
+			new Error(
+				`order_product with id: ${order_id}${product_id} can not be removed: ${err}`
+			)
 		);
 	}
 };
 
 export const orderRemoveAllProducts = async (
 	order_id: string | number
-): Promise<OrderProduct> => {
+): Promise<OrderProduct | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<OrderProduct> = await conn.query(
@@ -178,8 +209,10 @@ export const orderRemoveAllProducts = async (
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`order_product with id: ${order_id} can not be removed: ${err}`
+		handleError(
+			new Error(
+				`order_product with id: ${order_id} can not be removed: ${err}`
+			)
 		);
 	}
 };

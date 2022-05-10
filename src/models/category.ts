@@ -1,5 +1,5 @@
 import { PoolClient, QueryResult } from "pg";
-import client from "../services/connection";
+import client, { handleError } from "../services/connection";
 import { Category } from "../typings/interface";
 import { CategoryQuery } from "../typings/types";
 import { createInsert, createPatch, queryPrepare } from "../utils/db";
@@ -11,7 +11,7 @@ import {
 	checkCategoryExistQuery
 } from "./queries/categoryQueries";
 
-export const categoryIndex = async (): Promise<Category[]> => {
+export const categoryIndex = async (): Promise<Category[] | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<Category> = await conn.query(
@@ -20,13 +20,13 @@ export const categoryIndex = async (): Promise<Category[]> => {
 		conn.release();
 		return result.rows;
 	} catch (err) {
-		throw new Error(`categories index : ${err}`);
+		handleError(new Error(`categories index : ${err}`));
 	}
 };
 
 export const categoryShow = async (
 	category_id: string | number
-): Promise<Category> => {
+): Promise<Category | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<Category> = await conn.query(
@@ -36,8 +36,8 @@ export const categoryShow = async (
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`Category with id: ${category_id} does not exist: ${err}`
+		handleError(
+			new Error(`Category with id: ${category_id} does not exist: ${err}`)
 		);
 	}
 };
@@ -49,16 +49,16 @@ export const checkCategoryExist = async (
 		const conn: PoolClient = await client.connect();
 		const result = await conn.query(checkCategoryExistQuery, [category_id]);
 		conn.release();
-		if (result.rows[0]) return true;
+		if (result.rowCount > 0) return true;
 	} catch (err) {
-		return false;
+		handleError(err);
 	}
 	return false;
 };
 
 export const categoryProductsShow = async (
 	category_id: string | number
-): Promise<Category> => {
+): Promise<Category | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -78,8 +78,8 @@ export const categoryProductsShow = async (
 			}))
 		};
 	} catch (err) {
-		throw new Error(
-			`Category with id: ${category_id} does not exist: ${err}`
+		handleError(
+			new Error(`Category with id: ${category_id} does not exist: ${err}`)
 		);
 	}
 };
@@ -87,7 +87,7 @@ export const categoryProductsShow = async (
 export const categoryCreate = async ({
 	category_name,
 	category_description
-}: CategoryQuery): Promise<Category> => {
+}: CategoryQuery): Promise<Category | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const out = queryPrepare<Category>({
@@ -100,7 +100,7 @@ export const categoryCreate = async ({
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`Category not created: ${err}`);
+		handleError(new Error(`Category not created: ${err}`));
 	}
 };
 
@@ -108,7 +108,7 @@ export const categoryPatch = async ({
 	category_id,
 	category_name,
 	category_description
-}: CategoryQuery): Promise<Category> => {
+}: CategoryQuery): Promise<Category | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 
@@ -129,13 +129,13 @@ export const categoryPatch = async ({
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(`Category not patched: ${err}`);
+		handleError(new Error(`Category not patched: ${err}`));
 	}
 };
 
 export const categoryRemove = async (
 	category_id: string | number
-): Promise<Category> => {
+): Promise<Category | void> => {
 	try {
 		const conn: PoolClient = await client.connect();
 		const result: QueryResult<Category> = await conn.query(
@@ -145,8 +145,10 @@ export const categoryRemove = async (
 		conn.release();
 		return result.rows[0];
 	} catch (err) {
-		throw new Error(
-			`Category with id: ${category_id} can not be removed: ${err}`
+		handleError(
+			new Error(
+				`Category with id: ${category_id} can not be removed: ${err}`
+			)
 		);
 	}
 };

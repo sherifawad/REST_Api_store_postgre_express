@@ -1,9 +1,19 @@
 import supertest from "supertest";
+import * as _ from "lodash";
 import { orderIndex, orderShow, showOrderDetails } from "../../models/order";
 import { app } from "../../server";
+import client from "../../services/connection";
 import testData from "../helpers/testData";
+import { orderProducts } from "../../models/orderPRoducts";
 
 describe("Orders Endpoint /api/order", () => {
+	afterAll(() => {
+		console.log(
+			`function: Order Router afterAll, total: ${client.totalCount}, idle: ${client.idleCount}, waiting: ${client.waitingCount}`
+		);
+		console.log("=========================================");
+	});
+
 	const req = supertest(app);
 	it("POST should create new order POST /api/order", done => {
 		req.post("/api/order")
@@ -18,9 +28,18 @@ describe("Orders Endpoint /api/order", () => {
 			.then(async response => {
 				expect(response.body.data.order_id).toBeTruthy();
 				testData.apiTestOrder.order_id = response.body.data.order_id;
-				// expect(response.body.data).toEqual(
-				// 	await showOrderDetails(`${testData.apiTestOrder.order_id}`)
-				// );
+				const order = await orderShow(
+					`${testData.apiTestOrder.order_id}`
+				);
+				const products = await orderProducts(
+					`${testData.apiTestOrder.order_id}`
+				);
+
+				const construct = {
+					...order,
+					order_products: products
+				};
+				expect(response.body.data).toEqual(construct);
 				done();
 			});
 	});

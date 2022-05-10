@@ -1,5 +1,5 @@
 export const orderProductShowQuery =
-	"SELECT * FROM orders_products WHERE orders_id=($1) AND products_id=($2)";
+	"SELECT * FROM orders_products WHERE order_id=($1) AND products_id=($2)";
 
 export const orderProductsDetailsQuery = `SELECT * 
     FROM orders_products As op 
@@ -16,4 +16,4 @@ export const orderProductsRemoveQuery =
 	"DELETE FROM orders_products WHERE order_id=($1)";
 
 export const orderProductRemoveOPQuery =
-	"DELETE FROM orders_products WHERE orders_id=($1) AND products_id=($2)";
+	"DELETE FROM orders_products WHERE order_id=($1) AND products_id=($2)";

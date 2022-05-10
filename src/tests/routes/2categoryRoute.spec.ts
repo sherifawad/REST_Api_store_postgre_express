@@ -1,9 +1,16 @@
 import supertest from "supertest";
 import { categoryProductsShow, categoryShow } from "../../models/category";
 import { app } from "../../server";
+import client from "../../services/connection";
 import testData from "../helpers/testData";
 
 describe("Category Endpoint /api/category", () => {
+	afterAll(() => {
+		console.log(
+			`function:Category Router afterAll, total: ${client.totalCount}, idle: ${client.idleCount}, waiting: ${client.waitingCount}`
+		);
+		console.log("=========================================");
+	});
 	const req = supertest(app);
 
 	it("POST should create new category POST /api/category", done => {

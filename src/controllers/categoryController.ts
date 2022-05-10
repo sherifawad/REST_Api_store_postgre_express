@@ -17,7 +17,7 @@ export const categoryViewController = async (
 	try {
 		const { category_id } = req.params;
 		if (!category_id) throw new Error("No category_id");
-		const data: Category = await categoryShow(category_id);
+		const data: Category | void = await categoryShow(category_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -44,7 +44,7 @@ export const categoryProductsViewController = async (
 	try {
 		const { category_id } = req.params;
 		if (!category_id) throw new Error("No category_id");
-		const data: Category = await categoryProductsShow(category_id);
+		const data: Category | void = await categoryProductsShow(category_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -69,7 +69,7 @@ export const categoriesViewController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const data: Category[] = await categoryIndex();
+		const data: Category[] | void = await categoryIndex();
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -95,7 +95,7 @@ export const categoryAddController = async (
 ): Promise<Response> => {
 	try {
 		const { category_name, category_description } = req.body;
-		const data: Category = await categoryCreate({
+		const data: Category | void = await categoryCreate({
 			category_name,
 			category_description
 		});

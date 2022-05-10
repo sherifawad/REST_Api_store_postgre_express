@@ -16,7 +16,7 @@ export const orderViewController = async (
 	try {
 		const { order_id } = req.params;
 		if (!order_id) throw new Error("No order_id");
-		const data: Order | undefined = await showOrderDetails(order_id);
+		const data: Order | undefined | void = await showOrderDetails(order_id);
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -41,7 +41,7 @@ export const ordersViewController = async (
 	res: Response
 ): Promise<Response> => {
 	try {
-		const data: Omit<Order, "order_products">[] = await orderIndex();
+		const data: Omit<Order, "order_products">[] | void = await orderIndex();
 		if (!data) throw new Error("there are no data");
 		return res.status(200).json({
 			status: 200,
@@ -67,7 +67,7 @@ export const orderAddController = async (
 ): Promise<Response> => {
 	try {
 		const { user_id, order_date, order_products } = req.body;
-		const data: Order | undefined = await orderCreate({
+		const data: Order | undefined | void = await orderCreate({
 			user_id,
 			order_date,
 			order_products
@@ -101,18 +101,15 @@ export const orderUpdateController = async (
 		const { user_id, order_date, order_products } = req.body;
 		const { order_id } = req.params;
 		if (!order_id) throw new Error("No order_id");
-		const data: Omit<Order, "order_products"> | undefined =
-			await orderPatch({
-				order_id: parseInt(order_id, 10),
-				user_id,
-				order_date,
-				order_products
-			});
-		if (!data) throw new Error("there are no data");
+		await orderPatch({
+			order_id: parseInt(order_id, 10),
+			user_id,
+			order_date,
+			order_products
+		});
 		return res.status(200).json({
 			status: 200,
-			message: "Updated Successfully",
-			data
+			message: "Updated Successfully"
 		});
 	} catch (error) {
 		// check if instance of error not throw string but => throw new Error("")

@@ -56,7 +56,6 @@ export const checkProductExist = async (
 ): Promise<boolean> => {
 	try {
 		const conn: PoolClient = await client.connect();
-		// const sql = `SELECT product_id FROM products WHERE product_id=($1);`;
 		const result = await conn.query(checkProductExistQuery, [product_id]);
 		conn.release();
 		if (result.rows[0]) return true;
